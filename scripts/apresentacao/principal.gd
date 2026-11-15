@@ -18,6 +18,8 @@ const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.g
 const Sessao = preload("res://scripts/apresentacao/sessao.gd")
 const Regras = preload("res://scripts/core/regras.gd")
 const Figuras = preload("res://scripts/apresentacao/figuras.gd")
+const Sons = preload("res://scripts/apresentacao/sons.gd")
+const FASES := ["Preparação", "Exploração", "Resolução", "Reposição", "Avanço"]
 
 # Mesa (unidades do mundo)
 const TAM_CARTA_3D := Vector2(1.1, 1.54)
@@ -92,9 +94,21 @@ var dado_aguardando := false
 var girando := false
 var face_pendente := 0
 var arrastando_dado := false
+# Narração dos momentos
+var sons
+var momento_ativo := false
+var pulando := false
+var vitrine: Control
+var titulo_vitrine: Label
+var lugar_vitrine: CenterContainer
+var faixa: Label
+var legenda: Label
+var rotulos_fase: Array = []
 
 
 func _ready() -> void:
+	sons = Sons.new()
+	add_child(sons)
 	_criar_ambiente()
 	_criar_interface()
 	get_viewport().size_changed.connect(_ajustar_camera)
@@ -132,6 +146,8 @@ func nova_partida() -> void:
 	partida.passo_de_combate.connect(_ritmo_do_combate)
 	partida.dado.rolou.connect(_ao_rolar)
 	partida.dado_mostrado.connect(_ao_dado_mostrado)
+	partida.momento.connect(_ao_momento)
+	partida.fase.connect(_ao_mudar_fase)
 	partida.montar_mesa()
 	for k in clampi(Sessao.jogadores, 1, 4):
 		var decisor = DecisorInterface.new()
@@ -444,7 +460,7 @@ func _ao_revelar(carta_id: String) -> void:
 func _ritmo_do_combate() -> void:
 	_mostrar_danos()
 	_atualizar(true)
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(0.15).timeout
 	partida.continuar.emit()
 
 
@@ -1108,8 +1124,8 @@ func _criar_interface() -> void:
 	rotulo_dica = Label.new()
 	raiz.add_child(rotulo_dica)
 	rotulo_dica.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	rotulo_dica.offset_top = 54
-	rotulo_dica.offset_bottom = 110
+	rotulo_dica.offset_top = 96
+	rotulo_dica.offset_bottom = 150
 	rotulo_dica.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rotulo_dica.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rotulo_dica.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1117,6 +1133,66 @@ func _criar_interface() -> void:
 	rotulo_dica.add_theme_color_override("font_outline_color", Color.BLACK)
 	rotulo_dica.add_theme_constant_override("outline_size", 8)
 	rotulo_dica.add_theme_font_size_override("font_size", 23)
+
+	# Faixa das fases do turno, logo abaixo do topo.
+	var fases := PanelContainer.new()
+	raiz.add_child(fases)
+	fases.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	fases.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	fases.offset_top = 52
+	fases.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fases.add_theme_stylebox_override("panel", _estilo(Color(0, 0, 0, 0.55), Color(0, 0, 0, 0), 0, 14, 6))
+	var linha_fases := HBoxContainer.new()
+	linha_fases.add_theme_constant_override("separation", 6)
+	fases.add_child(linha_fases)
+	for i in FASES.size():
+		if i > 0:
+			linha_fases.add_child(_texto("›", 18, Color(0.6, 0.6, 0.6)))
+		var r := _texto(FASES[i], 18, Color(0.6, 0.6, 0.6))
+		r.autowrap_mode = TextServer.AUTOWRAP_OFF
+		linha_fases.add_child(r)
+		rotulos_fase.append(r)
+
+	# Narração: faixa grande e legenda no alto da mesa.
+	faixa = _texto("", 58, COR_OURO, 16)
+	raiz.add_child(faixa)
+	faixa.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	faixa.offset_top = 150
+	faixa.offset_bottom = 230
+	faixa.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	faixa.autowrap_mode = TextServer.AUTOWRAP_OFF
+	faixa.pivot_offset = Vector2(640, 40)
+	faixa.visible = false
+	legenda = _texto("", 30, Color.WHITE, 12)
+	raiz.add_child(legenda)
+	legenda.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	legenda.offset_top = 232
+	legenda.offset_bottom = 330
+	legenda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	legenda.visible = false
+
+	# Vitrine: a carta revelada aparece grande no meio da tela.
+	vitrine = Control.new()
+	raiz.add_child(vitrine)
+	vitrine.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vitrine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var fundo_vitrine := ColorRect.new()
+	fundo_vitrine.color = Color(0, 0, 0, 0.45)
+	fundo_vitrine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vitrine.add_child(fundo_vitrine)
+	fundo_vitrine.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var coluna_vitrine := VBoxContainer.new()
+	coluna_vitrine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coluna_vitrine.alignment = BoxContainer.ALIGNMENT_CENTER
+	vitrine.add_child(coluna_vitrine)
+	coluna_vitrine.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	titulo_vitrine = _texto("", 44, COR_OURO, 14)
+	titulo_vitrine.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna_vitrine.add_child(titulo_vitrine)
+	lugar_vitrine = CenterContainer.new()
+	lugar_vitrine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coluna_vitrine.add_child(lugar_vitrine)
+	vitrine.visible = false
 
 	# Mão: embaixo, no centro, saindo um pouco pela borda como nos jogos de cartas.
 	mao_2d = HBoxContainer.new()
@@ -1331,6 +1407,237 @@ func _acao(texto: String, acao: Callable, ativo: bool = true, principal: bool = 
 	acoes.add_child(b)
 
 
+# --- Narração dos momentos -----------------------------------------------------
+# A lógica emite um momento e espera; aqui ele é mostrado com faixa, legenda, sons e
+# animação. Um toque na tela adianta a narração.
+
+func _input(evento: InputEvent) -> void:
+	if momento_ativo and evento is InputEventMouseButton and not evento.pressed:
+		pulando = true
+
+
+func _esperar(segundos: float) -> void:
+	var fim := tempo + segundos
+	while tempo < fim and not pulando:
+		await get_tree().process_frame
+
+
+func _ao_mudar_fase(nome: String) -> void:
+	for r in rotulos_fase:
+		var atual: bool = r.text == nome
+		r.add_theme_color_override("font_color", COR_OURO if atual else Color(0.6, 0.6, 0.6))
+		r.add_theme_font_size_override("font_size", 22 if atual else 18)
+
+
+func _ao_momento(m: Dictionary) -> void:
+	momento_ativo = true
+	pulando = false
+	var vez := _vez(m.get("jogador", jogador))
+	match m["tipo"]:
+		"revelacao":
+			await _mostrar_revelacao(m["carta"])
+		"golpe":
+			await _mostrar_golpe(m)
+		"contra":
+			await _mostrar_contra(m)
+		"vitoria":
+			_mostrar_danos()
+			_atualizar(true)
+			sons.tocar("vitoria")
+			var por: String = _nome_curto(m["por"]) if m["por"] != null else "Sua equipe"
+			_anunciar("VITÓRIA!", "%s%s derrota %s  •  +%d moedas" % [vez, por, m["inimigo"].nome, m["moedas"]], COR_OURO)
+			await _esperar(0.5)
+			sons.tocar("moeda")
+			await _esperar(1.3)
+		"derrota_total":
+			sons.tocar("derrota")
+			_anunciar("DERROTA TOTAL", "%sToda a equipe caiu diante de %s. De volta ao reino inicial." % [vez, m["inimigo"].nome], Color(1, 0.35, 0.3))
+			await _esperar(2.2)
+		"evento":
+			var nome: String = cat.eventos[m["evento"]]["nome"]
+			if m["sucesso"]:
+				sons.tocar("vitoria")
+				_anunciar("EVENTO SUPERADO!", "%s%s  •  +%d moedas, +1 Evento" % [vez, nome, m["moedas"]], Color(0.5, 1, 0.55))
+			else:
+				sons.tocar("erro")
+				_anunciar("Não deu desta vez", "%s%s: sem progresso." % [vez, nome], Color(0.85, 0.85, 0.85))
+			_atualizar(true)
+			await _esperar(1.5)
+		"reino_concluido":
+			sons.tocar("vitoria")
+			_anunciar("%s CONCLUÍDO!" % m["reino"].to_upper(), "%s%s" % [vez, _texto_avanco(m["por"]).capitalize()], COR_OURO)
+			await _esperar(2.2)
+		"aviso":
+			_anunciar(m["titulo"], m["texto"], Color(0.6, 0.9, 1))
+			_atualizar(true)
+			await _esperar(1.6)
+	_esconder_anuncio()
+	momento_ativo = false
+	partida.continuar.emit()
+
+
+func _anunciar(titulo: String, texto: String, cor: Color) -> void:
+	faixa.text = titulo
+	faixa.add_theme_color_override("font_color", cor)
+	faixa.visible = not titulo.is_empty()
+	legenda.text = texto
+	legenda.visible = not texto.is_empty()
+	faixa.scale = Vector2(0.4, 0.4)
+	faixa.modulate.a = 0.0
+	legenda.modulate.a = 0.0
+	var tween := create_tween().set_parallel()
+	tween.tween_property(faixa, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(faixa, "modulate:a", 1.0, 0.2)
+	tween.tween_property(legenda, "modulate:a", 1.0, 0.3)
+
+
+func _esconder_anuncio() -> void:
+	faixa.visible = false
+	legenda.visible = false
+
+
+func _legenda(texto: String, cor: Color = Color.WHITE) -> void:
+	faixa.visible = false
+	legenda.text = texto
+	legenda.add_theme_color_override("font_color", cor)
+	legenda.visible = true
+	legenda.modulate.a = 0.0
+	create_tween().tween_property(legenda, "modulate:a", 1.0, 0.15)
+
+
+func _tremer_camera(forca: float) -> void:
+	var tween := create_tween()
+	for k in 6:
+		tween.tween_property(camera, "h_offset", randf_range(-forca, forca), 0.04)
+		tween.parallel().tween_property(camera, "v_offset", randf_range(-forca, forca), 0.04)
+	tween.tween_property(camera, "h_offset", 0.0, 0.05)
+	tween.parallel().tween_property(camera, "v_offset", 0.0, 0.05)
+
+
+## A carta revelada aparece grande, com o que ela faz, antes de ir para a mesa.
+func _mostrar_revelacao(id: String) -> void:
+	sons.tocar("carta")
+	for filho in lugar_vitrine.get_children():
+		lugar_vitrine.remove_child(filho)
+		filho.queue_free()
+	var tamanho := Vector2(250, 350)
+	var face: Control
+	match cat.tipo_de_carta(id):
+		"evento":
+			titulo_vitrine.text = "Evento!"
+			var ev: Dictionary = cat.eventos[id]
+			face = _face_texto(ev["nome"], "EVENTO", ev["efeito"], Color(0.12, 0.18, 0.32), Color(0.45, 0.65, 1), tamanho)
+		"mercador":
+			titulo_vitrine.text = "Um Mercador!"
+			face = _face_texto("Mercador", "LOJA", "Revela cinco itens. Compre quantos quiser pelos preços impressos.", Color(0.25, 0.18, 0.06), COR_OURO, tamanho)
+		"chefe":
+			titulo_vitrine.text = "O CHEFE APARECE!"
+			face = _face_inimigo_dados(cat.inimigos[id], tamanho)
+		_:
+			titulo_vitrine.text = "Um inimigo aparece!"
+			face = _face_inimigo_dados(cat.inimigos[id], tamanho)
+	lugar_vitrine.add_child(face)
+	vitrine.visible = true
+	vitrine.modulate.a = 0.0
+	face.scale = Vector2(0.3, 0.3)
+	var tween := create_tween().set_parallel()
+	tween.tween_property(vitrine, "modulate:a", 1.0, 0.2)
+	tween.tween_property(face, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK)
+	await _esperar(2.2)
+	var saida := create_tween()
+	saida.tween_property(vitrine, "modulate:a", 0.0, 0.2)
+	await saida.finished
+	vitrine.visible = false
+
+
+## Inimigo a partir dos dados do catálogo (antes de o combate começar), com o efeito.
+func _face_inimigo_dados(dados: Dictionary, tamanho: Vector2) -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var painel := _moldura(Color(0.16, 0.06, 0.05), Color(0.85, 0.25, 0.18), tamanho, int(5 * e))
+	var coluna := _ignorar_mouse(VBoxContainer.new())
+	coluna.add_theme_constant_override("separation", int(3 * e))
+	painel.add_child(coluna)
+	var topo := _ignorar_mouse(HBoxContainer.new())
+	coluna.add_child(topo)
+	topo.add_child(_medalhao(str(int(dados["ameaca"])), COR_OURO, e * 0.8, Color.BLACK))
+	var nome := _texto(dados["nome"], int(15 * e), Color.WHITE, int(4 * e))
+	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	topo.add_child(nome)
+	var hab := _texto(dados["habilidade"], int(12 * e), Color(1, 0.85, 0.6))
+	hab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(hab)
+	var texto := _texto(dados["efeito"], int(9.5 * e), Color(0.92, 0.92, 0.92))
+	texto.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	coluna.add_child(texto)
+	var base := _ignorar_mouse(HBoxContainer.new())
+	coluna.add_child(base)
+	base.add_child(_medalhao(str(int(dados["forca"])), COR_FORCA, e))
+	var meio := _texto("Força   •   Armadura", int(10 * e), Color(0.8, 0.8, 0.8))
+	meio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	meio.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	meio.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	base.add_child(meio)
+	base.add_child(_medalhao(str(int(dados["armadura_maxima"])), COR_ARMADURA, e))
+	return painel
+
+
+func _mostrar_golpe(m: Dictionary) -> void:
+	var c = m["de"]
+	var dano: int = m["dano"]
+	var face_dado: int = m["face"]
+	_mostrar_danos()
+	_atualizar(true)
+	if dano <= 0:
+		sons.tocar("erro")
+		_legenda("%s errou o golpe!" % _nome_curto(c), Color(0.8, 0.8, 0.8))
+	elif face_dado == 6:
+		sons.tocar("critico")
+		_tremer_camera(0.12)
+		_anunciar("CRÍTICO!", "%s acerta %s: %d de dano!" % [_nome_curto(c), m["em"].nome, dano], Color(1, 0.55, 0.2))
+	else:
+		sons.tocar("golpe")
+		_legenda("%s acerta %s: %d de dano!" % [_nome_curto(c), m["em"].nome, dano], Color(1, 0.95, 0.75))
+	await _esperar(1.2)
+
+
+func _mostrar_contra(m: Dictionary) -> void:
+	var ini = m["de"]
+	var alvo = m["em"]
+	if m["falhou"]:
+		sons.tocar("erro")
+		_legenda("Escorregão Tático! %s erra o ataque." % ini.nome, Color(0.6, 1, 0.6))
+		await _esperar(1.3)
+		return
+	# O inimigo avança sobre quem ele ataca.
+	var no_alvo = cartas_3d.get(_chave(alvo))
+	if figura_inimigo != null and no_alvo != null:
+		var origem: Vector3 = figura_inimigo.position
+		var destino: Vector3 = origem.lerp(no_alvo.position, 0.6) + Vector3(0, 0.3, 0)
+		var tween := create_tween()
+		tween.tween_property(figura_inimigo, "position", destino, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(figura_inimigo, "position", origem, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		await get_tree().create_timer(0.2).timeout
+	var dano: int = m["dano"]
+	_mostrar_danos()
+	_atualizar(true)
+	var texto: String
+	if m["roubo"]:
+		sons.tocar("moeda")
+		texto = "%s roubam até %d moedas!" % [ini.nome, dano]
+	elif dano <= 0:
+		sons.tocar("erro")
+		texto = "%s ataca %s e erra!" % [ini.nome, _nome_curto(alvo)]
+	else:
+		sons.tocar("golpe")
+		texto = "%s ataca %s: %d de dano!" % [ini.nome, _nome_curto(alvo), dano]
+	if m["derrotado"]:
+		sons.tocar("derrota")
+		_anunciar("%s caiu!" % _nome_curto(alvo), texto, Color(1, 0.4, 0.35))
+	else:
+		_legenda(texto, Color(1, 0.75, 0.7))
+	await _esperar(1.4 if m["derrotado"] else 1.2)
+
+
 # --- Janela do dado ------------------------------------------------------------
 # O jogo entrega o dado; o jogador arrasta e solta (ou toca em "Jogar!"). O valor
 # é sorteado pela lógica no momento do lançamento e a janela só o mostra.
@@ -1405,6 +1712,7 @@ func _lancar_dado() -> void:
 	var tween := create_tween()
 	tween.tween_property(dado_visual, "position", _centro_dado(), 0.35).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	_iniciar_giro()
+	sons.tocar("dado")
 	decisor_atual.responder(null)
 
 
@@ -1433,6 +1741,7 @@ func _ao_dado_mostrado(motivo: String, face: int, do_jogador: bool) -> void:
 	if not do_jogador:
 		_abrir_dado(_motivo_legivel(motivo), false)
 		_iniciar_giro()
+		sons.tocar("dado")
 	elif not girando:
 		_iniciar_giro()
 	face_pendente = face
@@ -1569,7 +1878,7 @@ func _comecar_turno() -> void:
 func _tela_preparacao() -> void:
 	modo = "preparacao"
 	_atualizar(true)
-	rotulo_dica.text = "%sPreparação: arraste Cavaleiros da mão para a mesa, toque num item para equipar. Depois explore." % _vez(jogador)
+	rotulo_dica.text = "%sArraste Cavaleiros da mão para a mesa ou equipe itens. Quando estiver pronto, explore o reino." % _vez(jogador)
 	_limpar_acoes()
 	_acao("Explorar o reino", _explorar, true, true)
 	_acao("Comprar Cavaleiro (1)", _comprar_cavaleiro, not jogador.comprou_cavaleiro_no_turno and jogador.moedas >= 1)

@@ -45,6 +45,12 @@ func _initialize() -> void:
 		await _esperar(0.4)
 		if _botao_existe("Próximo turno") or cena.partida.playtest_encerrado:
 			break
+		if cena.vitrine.visible:
+			_salvar_uma_vez("8d_revelacao")
+		if cena.faixa.visible:
+			_salvar_uma_vez("8e_faixa_" + cena.faixa.text.left(8).to_lower().replace(" ", ""))
+		elif cena.legenda.visible:
+			_salvar_uma_vez("8f_legenda")
 		if cena.camada_dado.visible and cena.dado_aguardando:
 			_salvar_uma_vez("8a_jogue_o_dado")
 			cena._lancar_dado()

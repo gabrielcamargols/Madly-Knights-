@@ -8,6 +8,10 @@ signal passo_de_combate
 signal continuar
 ## Com pausas ligadas, cada rolagem "na janela" emite este sinal e espera `continuar`.
 signal dado_mostrado(motivo: String, face: int, do_jogador: bool)
+## Momentos que a apresentação narra (revelação, golpe, vitória...). Com pausas ligadas,
+## a lógica espera `continuar` depois de cada um.
+signal momento(dados: Dictionary)
+signal fase(nome: String)
 
 const Regras = preload("res://scripts/core/regras.gd")
 const Cavaleiro = preload("res://scripts/core/cavaleiro.gd")
@@ -346,6 +350,7 @@ func iniciar_turno(j) -> bool:
 	j.comprou_cavaleiro_no_turno = false
 	j.comprou_as_cegas_no_turno = false
 	registrar("— Turno %d de %s em %s —" % [turno, j.id, j.reino_atual])
+	fase.emit("Preparação")
 	var avancou: bool = await _verificar_avanco(j)
 	if avancou:
 		_fim_do_turno(j)
@@ -354,11 +359,17 @@ func iniciar_turno(j) -> bool:
 
 ## Exploração, Resolução, Reposição e Avanço. As decisões do jogador podem esperar a interface.
 func explorar_e_resolver(j) -> Dictionary:
+	fase.emit("Exploração")
 	var carta_id := _explorar(j)
 	relatorio["revelacao"] = carta_id
+	if carta_id != "":
+		await _momento({"tipo": "revelacao", "carta": carta_id, "jogador": j})
+	fase.emit("Resolução")
 	var resultado: String = await _resolver(j, carta_id)
 	if resultado != "derrota_total":
 		relatorio["moedas_antes_reposicao"] = j.moedas
+		if j.vagas > 0:
+			fase.emit("Reposição")
 		await _repor(j)
 		for outro in jogadores:
 			if outro != j and outro.vagas > 0:
@@ -559,7 +570,8 @@ func _combate(j, carta_id: String) -> String:
 			continue
 		await _contra_ataque(j, atacante, ini)
 		await _pausa()
-	_vitoria(j, ultimo, ini)
+	var ganho: int = _vitoria(j, ultimo, ini)
+	await _momento({"tipo": "vitoria", "inimigo": ini, "moedas": ganho, "por": ultimo, "jogador": j})
 	return "ok"
 
 
@@ -593,6 +605,12 @@ func _rolar_visivel(motivo: String, do_jogador: bool) -> int:
 		dado_mostrado.emit(motivo, face, do_jogador)
 		await continuar
 	return face
+
+
+func _momento(dados: Dictionary) -> void:
+	if com_pausas:
+		momento.emit(dados)
+		await continuar
 
 
 func _pausa() -> void:
@@ -685,6 +703,7 @@ func _ataque_do_cavaleiro(j, c, ini) -> void:
 		_ferir_cavaleiro(j, c, 1, null)
 	if face == 6 and c.tem_item("martelo_galo_despertador"):
 		ini.flags["sem_contra_ataque"] = true
+	await _momento({"tipo": "golpe", "de": c, "em": ini, "dano": dano, "face": face, "jogador": j})
 
 
 func _contra_ataque(j, alvo, ini) -> void:
@@ -694,6 +713,8 @@ func _contra_ataque(j, alvo, ini) -> void:
 		return
 	relatorio["contra_ataques"] += 1
 	var falhou := false
+	var dano_mostrado := 0
+	var roubo := false
 	if alvo.id_carta == "cavaleiro_banana" and alvo.usar("Escorregão Tático"):
 		var escorregao: int = await _rolar_do_jogador(j, "escorregao_tatico_" + Regras.chave(alvo.id_instancia))
 		if escorregao >= 5:
@@ -714,11 +735,14 @@ func _contra_ataque(j, alvo, ini) -> void:
 		if alvo.vivo():
 			if ini.id == "ratos_mafiosos":
 				j.moedas = maxi(0, j.moedas - dano)
+				roubo = true
 				registrar("Os Ratos roubam até %d moedas." % dano)
 			else:
 				if dano > 0 and alvo.tem_item("guarda_chuva_draconico") and _quer(j, alvo, "Previsão: Dor") and alvo.usar("Previsão: Dor"):
 					dano = dano / 2
 				_ferir_cavaleiro(j, alvo, dano, ini, true)
+		dano_mostrado = dano
+	await _momento({"tipo": "contra", "de": ini, "em": alvo, "dano": dano_mostrado, "falhou": falhou, "roubo": roubo, "derrotado": not alvo.vivo(), "jogador": j})
 	if ini.id == "barao_do_pantano" and ini.vivo():
 		if alvo.vivo():
 			_mover_apos_ataque(j, alvo, ini)
@@ -727,6 +751,7 @@ func _contra_ataque(j, alvo, ini) -> void:
 				_ferir_cavaleiro(j, outro, 1, null)
 		relatorio["filas_apos_salto"].append(Jogador.ids(j.fila))
 		registrar("Salto Lodoso! Fila: %s." % ", ".join(j.fila.map(func(c): return c.nome)))
+		await _momento({"tipo": "aviso", "titulo": "Salto Lodoso!", "texto": "O Barão pula: quem foi atacado vai ao fim da fila e os outros sofrem 1 de dano.", "jogador": j})
 
 
 func _anotar_armadura(ini) -> void:
@@ -798,7 +823,7 @@ func _cavaleiro_derrotado(j, c, fonte) -> void:
 		_anotar_armadura(fonte)
 
 
-func _vitoria(j, atacante, ini) -> void:
+func _vitoria(j, atacante, ini) -> int:
 	var moedas: int = ini.ameaca
 	if atacante != null and atacante.tem_item(Regras.ID_ESPADA):
 		moedas *= 2
@@ -817,9 +842,11 @@ func _vitoria(j, atacante, ini) -> void:
 			atacante.curar(3)
 		_mover_apos_ataque(j, atacante, null)
 	descartes_reino[j.reino_atual].append(ini.id)
+	return moedas
 
 
 func _derrota_total(j, ini) -> String:
+	await _momento({"tipo": "derrota_total", "inimigo": ini, "jogador": j})
 	registrar("Derrota total! %s volta a %s." % [j.id, j.reino_inicial])
 	relatorio["derrota_total"] = true
 	descartes_reino[j.reino_atual].append(ini.id)
@@ -853,6 +880,9 @@ func _evento(j, id: String) -> void:
 	var ev: Dictionary = cat.eventos[id]
 	relatorio["evento"] = id
 	var participantes := _participantes(j, ev)
+	var antes := {}
+	for p in participantes:
+		antes[p] = [p.eventos, p.moedas]
 	match id:
 		"ponte_despencando":
 			await _ponte(participantes)
@@ -870,6 +900,9 @@ func _evento(j, id: String) -> void:
 			await _furacao(j)
 		_:
 			registrar("Evento sem implementação: %s" % id)
+	for p in participantes:
+		var superou: bool = p.eventos > antes[p][0]
+		await _momento({"tipo": "evento", "evento": id, "sucesso": superou, "moedas": p.moedas - antes[p][1], "jogador": p})
 
 
 func _superou_evento(p) -> void:
@@ -1090,6 +1123,8 @@ func _verificar_avanco(j) -> bool:
 	if por == "":
 		return false
 	var origem: String = j.reino_atual
+	fase.emit("Avanço")
+	await _momento({"tipo": "reino_concluido", "reino": origem, "por": por, "jogador": j})
 	relatorio["inimigos_antes_avanco"] = j.inimigos
 	relatorio["eventos_antes_avanco"] = j.eventos
 	relatorio["moedas_antes_conversao"] = j.moedas

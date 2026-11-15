@@ -270,6 +270,8 @@ func _criar_interface() -> void:
 
 
 func _perguntar(texto: String) -> void:
+	if not texto.is_empty():
+		texto = texto[0].to_upper() + texto.substr(1)
 	rotulo_pergunta.text = texto
 	for recipiente in [botoes, lista]:
 		for b in recipiente.get_children():

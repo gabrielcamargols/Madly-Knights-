@@ -30,5 +30,6 @@ func _esperar(segundos: float) -> void:
 func _salvar(caminho: String) -> void:
 	DirAccess.make_dir_recursive_absolute("res://capturas")
 	var imagem := root.get_viewport().get_texture().get_image()
+	imagem.resize(imagem.get_width() / 2, imagem.get_height() / 2, Image.INTERPOLATE_BILINEAR)
 	imagem.save_png("res://" + caminho)
 	print("Captura salva: " + caminho)

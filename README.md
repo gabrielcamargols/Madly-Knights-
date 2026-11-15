@@ -1,6 +1,6 @@
 # Madly Knights!
 
-Jogo de cartas de aventura em **Godot 4.7**, Modo Contra para 1 a 4 jogadores.
+Jogo de cartas de aventura em **Godot 4.7**, Modo Contra, com foco no **modo solo** (o modo local com vários jogadores no mesmo aparelho foi cancelado; o motor de regras ainda cobre o cenário de dois jogadores com Evento compartilhado).
 
 O primeiro objetivo é o playtest 3D no **Pântano Maluco**, do recrutamento inicial ao primeiro avanço válido.
 

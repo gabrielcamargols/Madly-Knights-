@@ -15,7 +15,6 @@ const Partida = preload("res://scripts/core/partida.gd")
 const Dado = preload("res://scripts/core/dado.gd")
 const Embaralhador = preload("res://scripts/core/embaralhador.gd")
 const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.gd")
-const Sessao = preload("res://scripts/apresentacao/sessao.gd")
 const Regras = preload("res://scripts/core/regras.gd")
 const Figuras = preload("res://scripts/apresentacao/figuras.gd")
 const Sons = preload("res://scripts/apresentacao/sons.gd")
@@ -160,7 +159,7 @@ func nova_partida() -> void:
 	partida.momento.connect(_ao_momento)
 	partida.fase.connect(_ao_mudar_fase)
 	partida.montar_mesa()
-	for k in clampi(Sessao.jogadores, 1, 4):
+	for k in 1:  # modo solo; o modo local com vários jogadores foi cancelado
 		var decisor = DecisorInterface.new()
 		decisor.pedido.connect(_ao_pedido.bind(decisor))
 		partida.adicionar_jogador("j%d" % (k + 1), [], decisor)

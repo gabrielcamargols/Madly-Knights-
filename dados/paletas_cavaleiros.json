@@ -1,0 +1,244 @@
+{
+ "nota": "Proposta: cores dos modelos 3D temporários. Cavaleiros do baralho de teste definidos à mão a partir das ilustrações (campo fonte); os demais extraídos automaticamente. elmo_forma, porte e extra também são propostas.",
+ "paletas": {
+  "cavaleiro_banana": {
+   "armadura": "#6e6a3a",
+   "detalhe": "#5b2340",
+   "elmo": "#e8b52e",
+   "elmo_forma": "banana",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_boxeador": {
+   "armadura": "#b5302a",
+   "detalhe": "#e8dcc8",
+   "elmo": "#a8262a",
+   "elmo_forma": "redondo",
+   "extra": "luvas",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_pizza": {
+   "armadura": "#d9a53a",
+   "detalhe": "#b8322e",
+   "elmo": "#e9b04a",
+   "elmo_forma": "fatia",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_pombo": {
+   "armadura": "#daae78",
+   "detalhe": "#465c61",
+   "elmo": "#5d4342"
+  },
+  "cavaleiro_yeti": {
+   "armadura": "#424962",
+   "detalhe": "#cdb1ac",
+   "elmo": "#7e84a2"
+  },
+  "cavaleiro_pao_com_manteiga": {
+   "armadura": "#e6dcc5",
+   "detalhe": "#e7b43a",
+   "elmo": "#d9a35c",
+   "elmo_forma": "torrada",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_elegante": {
+   "armadura": "#c97755",
+   "detalhe": "#52323e",
+   "elmo": "#f5b278"
+  },
+  "cavaleiro_mexicano": {
+   "armadura": "#c55b40",
+   "detalhe": "#72322e",
+   "elmo": "#e38c6a"
+  },
+  "cavaleiro_rato": {
+   "armadura": "#ce7435",
+   "detalhe": "#f8b255",
+   "elmo": "#664049"
+  },
+  "cavaleiro_queijo": {
+   "armadura": "#94392c",
+   "detalhe": "#dd833d",
+   "elmo": "#f6b769"
+  },
+  "cavaleiro_aranha": {
+   "armadura": "#8e2a2a",
+   "detalhe": "#c9963c",
+   "elmo": "#9a2b2b",
+   "elmo_forma": "aranha",
+   "extra": "capa",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_arqueiro": {
+   "armadura": "#6383c3",
+   "detalhe": "#b9644a",
+   "elmo": "#9b98b9"
+  },
+  "cavaleiro_bardo": {
+   "armadura": "#d98256",
+   "detalhe": "#9d454d",
+   "elmo": "#52273e"
+  },
+  "cavaleiro_beisebol": {
+   "armadura": "#efb076",
+   "detalhe": "#ba7657",
+   "elmo": "#434362"
+  },
+  "cavaleiro_besouro": {
+   "armadura": "#e4a652",
+   "detalhe": "#765341",
+   "elmo": "#465050"
+  },
+  "cavaleiro_bombado": {
+   "armadura": "#a8302a",
+   "detalhe": "#d4a24a",
+   "elmo": "#a02c28",
+   "elmo_forma": "redondo",
+   "porte": "largo",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_bruno": {
+   "armadura": "#e2a071",
+   "detalhe": "#703e36",
+   "elmo": "#6b4f5c"
+  },
+  "cavaleiro_bumerangue": {
+   "armadura": "#865841",
+   "detalhe": "#d9986b",
+   "elmo": "#5a7975"
+  },
+  "cavaleiro_cachorro": {
+   "armadura": "#d9925d",
+   "detalhe": "#893a2c",
+   "elmo": "#495972"
+  },
+  "cavaleiro_caipira": {
+   "armadura": "#8f552b",
+   "detalhe": "#d29942",
+   "elmo": "#a0a0a0"
+  },
+  "cavaleiro_careca_de_trancas": {
+   "armadura": "#4a66be",
+   "detalhe": "#dfb7a5",
+   "elmo": "#7e555a"
+  },
+  "cavaleiro_cavalo": {
+   "armadura": "#e88765",
+   "detalhe": "#9b3f39",
+   "elmo": "#a0a0a0"
+  },
+  "cavaleiro_chocotone": {
+   "armadura": "#d56f48",
+   "detalhe": "#6e2729",
+   "elmo": "#fab664"
+  },
+  "cavaleiro_cogumelo": {
+   "armadura": "#df855c",
+   "detalhe": "#642f40",
+   "elmo": "#a0a0a0"
+  },
+  "cavaleiro_corvo": {
+   "armadura": "#368096",
+   "detalhe": "#7d5654",
+   "elmo": "#98846e"
+  },
+  "cavaleiro_cosmico": {
+   "armadura": "#674991",
+   "detalhe": "#9e4f3e",
+   "elmo": "#6c364c"
+  },
+  "cavaleiro_cowboy": {
+   "armadura": "#b14333",
+   "detalhe": "#6969a6",
+   "elmo": "#eaa778"
+  },
+  "cavaleiro_da_faxina": {
+   "armadura": "#cc7230",
+   "detalhe": "#f7b568",
+   "elmo": "#874125"
+  },
+  "cavaleiro_dando_grau": {
+   "armadura": "#d4a032",
+   "detalhe": "#b03232",
+   "elmo": "#d9a83a",
+   "elmo_forma": "redondo",
+   "extra": "pluma",
+   "fonte": "ilustração"
+  },
+  "cavaleiro_de_patins": {
+   "armadura": "#ee947e",
+   "detalhe": "#ca6e7f",
+   "elmo": "#8e6893"
+  },
+  "cavaleiro_siames": {
+   "armadura": "#6a3940",
+   "detalhe": "#393856",
+   "elmo": "#3d2733"
+  },
+  "cavaleira": {
+   "armadura": "#633635",
+   "detalhe": "#c07a6c",
+   "elmo": "#a0a0a0"
+  },
+  "cavaleiro_buraco_negro": {
+   "armadura": "#b77e91",
+   "detalhe": "#e5a198",
+   "elmo": "#51353e"
+  },
+  "cavaleiro_cavaleiro": {
+   "armadura": "#daa687",
+   "detalhe": "#a4372c",
+   "elmo": "#816f79"
+  },
+  "cavaleiro_coxinha": {
+   "armadura": "#b3502b",
+   "detalhe": "#df814f",
+   "elmo": "#4b2422"
+  },
+  "cavaleiro_das_neves": {
+   "armadura": "#666778",
+   "detalhe": "#a1a0b3",
+   "elmo": "#ccc2c9"
+  },
+  "cavaleiro_ninja": {
+   "armadura": "#6c4433",
+   "detalhe": "#384440",
+   "elmo": "#737969"
+  },
+  "cavaleiro_pato": {
+   "armadura": "#5a7973",
+   "detalhe": "#6c473a",
+   "elmo": "#d5c2a6"
+  },
+  "cavaleiro_pinguim": {
+   "armadura": "#c47757",
+   "detalhe": "#f4be88",
+   "elmo": "#6e4b4c"
+  },
+  "cavaleiro_rei": {
+   "armadura": "#9d6445",
+   "detalhe": "#4d413e",
+   "elmo": "#d9ad7e"
+  },
+  "cavaleiro_dragao": {
+   "armadura": "#b5402e",
+   "detalhe": "#e0a030",
+   "elmo": "#a8392a",
+   "elmo_forma": "chifres",
+   "fonte": "proposta, sem ilustração"
+  },
+  "cavaleiro_tigre": {
+   "armadura": "#e08a2a",
+   "detalhe": "#2a2a2a",
+   "elmo": "#e3922f",
+   "elmo_forma": "orelhas",
+   "fonte": "proposta, sem ilustração"
+  },
+  "cavaleiro_rosquinha_de_chocolate": {
+   "armadura": "#6b3e22",
+   "detalhe": "#e98fb0",
+   "elmo": "#7a4526",
+   "elmo_forma": "rosquinha",
+   "fonte": "proposta, sem ilustração"
+  }
+ }
+}

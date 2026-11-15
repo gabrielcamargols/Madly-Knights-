@@ -3,9 +3,10 @@ extends Node3D
 ## Só lê o estado da partida e mostra os resultados que a lógica devolveu;
 ## não decide regras nem rola dados. A arte das cartas é provisória.
 ##
-## Mesa (3D, em perspectiva): o encontro no topo, as 6 vagas da sua fila embaixo dele,
-## baralho do reino e Cemitério à esquerda. As cartas da mesa são as mesmas cartas
-## desenhadas da mão, renderizadas sobre o tabuleiro.
+## Direção visual (docs/DIRECAO_VISUAL.md): personagens e cenário em 3D cartunesco,
+## cartas 2D ilustradas na interface. No tabuleiro, cada Cavaleiro é uma figura 3D
+## temporária com uma plaquinha (nome, Armadura, Força); o inimigo também. Baralho do
+## reino e Cemitério ficam à esquerda como cartas.
 ## Mão (2D) embaixo; arraste uma carta para a mesa para jogá-la.
 ## Escolhas aparecem no centro da tela com as cartas grandes. Ações ficam à direita.
 
@@ -16,6 +17,7 @@ const Embaralhador = preload("res://scripts/core/embaralhador.gd")
 const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.gd")
 const Sessao = preload("res://scripts/apresentacao/sessao.gd")
 const Regras = preload("res://scripts/core/regras.gd")
+const Figuras = preload("res://scripts/apresentacao/figuras.gd")
 
 # Mesa (unidades do mundo)
 const TAM_CARTA_3D := Vector2(1.1, 1.54)
@@ -24,8 +26,8 @@ const VAGAS := 6
 const POS_FILA_Z := 0.35
 const POS_ENCONTRO := Vector3(0.0, 0.0, -1.85)
 const ESCALA_ENCONTRO := 1.45
-const POS_REINO := Vector3(-5.0, 0.0, -1.7)
-const POS_CEMITERIO := Vector3(-5.0, 0.0, 0.35)
+const POS_REINO := Vector3(-4.6, 0.0, -1.85)
+const POS_CEMITERIO := Vector3(4.6, 0.0, -1.85)
 const POS_ENTRADA := Vector3(0.0, 0.0, 3.6)
 const PIXELS_CARTA := Vector2i(280, 392)  # textura de cada carta da mesa
 
@@ -52,6 +54,9 @@ var atacante_escolhido = null
 var selecionados: Array = []
 var armaduras_vistas: Dictionary = {}
 var carta_revelada := ""
+var paletas: Dictionary = {}
+var figura_inimigo: Node3D = null
+var tempo := 0.0
 
 var camera: Camera3D
 var cartas_3d: Dictionary = {}  # "jogador/id_instancia" -> Node3D
@@ -74,6 +79,7 @@ var cartas_escolha: HFlowContainer
 var botoes_escolha: HFlowContainer
 var camada_detalhes: Control
 var texto_detalhes: RichTextLabel
+var carta_detalhes: CenterContainer
 var rotulo_dado: Label
 
 
@@ -86,6 +92,9 @@ func _ready() -> void:
 	if not cat.carregar():
 		rotulo_dica.text = "Erro ao carregar os dados do jogo."
 		return
+	var dados_paletas = Catalogo.ler_json("res://dados/paletas_cavaleiros.json")
+	if dados_paletas != null:
+		paletas = dados_paletas["paletas"]
 	carta_encontro = _criar_carta_3d()
 	carta_encontro.position = POS_ENCONTRO
 	carta_encontro.scale = Vector3(ESCALA_ENCONTRO, 1.0, ESCALA_ENCONTRO)
@@ -135,23 +144,35 @@ func _criar_ambiente() -> void:
 	camera = Camera3D.new()
 	add_child(camera)
 	var luz := DirectionalLight3D.new()
-	luz.rotation_degrees = Vector3(-60, 30, 0)
+	luz.rotation_degrees = Vector3(-55, 35, 0)
+	luz.light_color = Color(1.0, 0.93, 0.8)
+	luz.light_energy = 1.15
+	luz.shadow_enabled = true
 	add_child(luz)
 	var ambiente := WorldEnvironment.new()
 	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.06, 0.08, 0.07)
+	var ceu := Sky.new()
+	var ceu_material := ProceduralSkyMaterial.new()
+	ceu_material.sky_top_color = Color(0.42, 0.6, 0.78)
+	ceu_material.sky_horizon_color = Color(0.9, 0.84, 0.72)
+	ceu_material.ground_horizon_color = Color(0.6, 0.62, 0.5)
+	ceu_material.ground_bottom_color = Color(0.3, 0.35, 0.25)
+	ceu.sky_material = ceu_material
+	env.background_mode = Environment.BG_SKY
+	env.sky = ceu
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.7, 0.7, 0.7)
+	env.ambient_light_color = Color(0.62, 0.66, 0.7)
+	env.ambient_light_energy = 0.9
 	ambiente.environment = env
 	add_child(ambiente)
-	# Tabuleiro: madeira com um feltro verde de pântano no centro.
-	_plano(Vector2(15, 10), Vector3(0, -0.06, -0.4), Color(0.3, 0.2, 0.12))
-	_plano(Vector2(9.0, 6.4), Vector3(0.6, -0.05, -0.75), Color(0.16, 0.26, 0.18))
-	_plano(Vector2(9.0, 0.06), Vector3(0.6, -0.04, -0.62), COR_OURO.darkened(0.3))
+	# Pântano acolhedor em volta (proposta) e o tablado de pedra com musgo.
+	Figuras.pantano(self)
+	_plano(Vector2(11.2, 6.2), Vector3(0.0, -0.08, -0.75), Color(0.6, 0.55, 0.47))
+	_plano(Vector2(10.4, 5.5), Vector3(0.0, -0.06, -0.75), Color(0.3, 0.42, 0.27))
+	_plano(Vector2(10.4, 0.06), Vector3(0.0, -0.05, -0.62), COR_OURO.darkened(0.3))
 	# Vagas da fila.
 	for i in VAGAS:
-		var vaga := _plano(TAM_CARTA_3D * 1.06, _pos_vaga(i) + Vector3(0, 0.01, 0), Color(0.09, 0.14, 0.1))
+		var vaga := _plano(Vector2(1.1, 1.1), _pos_vaga(i) + Vector3(0, -0.04, 0), Color(0.2, 0.3, 0.19))
 		vaga.name = "Vaga%d" % i
 	var marca := Label3D.new()
 	marca.text = "ataca primeiro"
@@ -159,7 +180,8 @@ func _criar_ambiente() -> void:
 	marca.pixel_size = 0.005
 	marca.rotation_degrees.x = -90
 	marca.modulate = COR_OURO
-	marca.position = _pos_vaga(0) + Vector3(0, 0.02, 0.98)
+	marca.outline_size = 8
+	marca.position = _pos_vaga(0) + Vector3(0, -0.02, 0.72)
 	add_child(marca)
 
 
@@ -177,7 +199,7 @@ func _plano(tamanho: Vector2, posicao: Vector3, cor: Color) -> MeshInstance3D:
 
 
 func _pos_vaga(i: int) -> Vector3:
-	return Vector3((i - (VAGAS - 1) / 2.0) * ESPACO_VAGA + 0.6, 0.0, POS_FILA_Z)
+	return Vector3((i - (VAGAS - 1) / 2.0) * ESPACO_VAGA, 0.0, POS_FILA_Z)
 
 
 ## Na horizontal a altura da mesa cabe na tela; na vertical, a largura.
@@ -224,9 +246,89 @@ func _desenhar(no: Node3D, face: Control) -> void:
 	for filho in vp.get_children():
 		vp.remove_child(filho)
 		filho.queue_free()
-	face.custom_minimum_size = Vector2(PIXELS_CARTA)
-	face.size = Vector2(PIXELS_CARTA)
+	face.custom_minimum_size = Vector2(vp.size)
+	face.size = Vector2(vp.size)
 	vp.add_child(face)
+
+
+## Figura 3D com uma plaquinha flutuante (nome, barra de Armadura e atributos).
+func _criar_figura(figura: Node3D, altura_placa: float) -> Node3D:
+	var raiz := Node3D.new()
+	figura.name = "Figura"
+	raiz.add_child(figura)
+	var vp := SubViewport.new()
+	vp.name = "VP"
+	vp.size = Vector2i(260, 92)
+	vp.transparent_bg = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	raiz.add_child(vp)
+	var placa := Sprite3D.new()
+	placa.name = "Placa"
+	placa.texture = vp.get_texture()
+	placa.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	placa.pixel_size = 0.0045
+	placa.no_depth_test = true
+	placa.render_priority = 10
+	placa.position = Vector3(0, altura_placa, 0)
+	raiz.add_child(placa)
+	add_child(raiz)
+	return raiz
+
+
+func _face_placa(nome: String, armadura: int, maxima: int, forca: int, cor_barra: Color, borda: Color) -> PanelContainer:
+	var painel := PanelContainer.new()
+	painel.add_theme_stylebox_override("panel", _estilo(Color(0.06, 0.05, 0.05, 0.85), borda, 4, 14, 6))
+	var coluna := _ignorar_mouse(VBoxContainer.new())
+	coluna.add_theme_constant_override("separation", 2)
+	painel.add_child(coluna)
+	var linha := _ignorar_mouse(HBoxContainer.new())
+	coluna.add_child(linha)
+	linha.add_child(_medalhao(str(forca), COR_FORCA, 0.95))
+	var rotulo := _texto(nome, 22, Color.WHITE, 5)
+	rotulo.autowrap_mode = TextServer.AUTOWRAP_OFF
+	rotulo.clip_text = true
+	rotulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rotulo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	rotulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	linha.add_child(rotulo)
+	linha.add_child(_medalhao(str(armadura), COR_ARMADURA, 0.95, Color(1, 0.55, 0.5) if armadura < maxima else Color.WHITE))
+	var barra := ProgressBar.new()
+	barra.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	barra.max_value = maxi(1, maxima)
+	barra.value = armadura
+	barra.show_percentage = false
+	barra.custom_minimum_size = Vector2(0, 14)
+	barra.add_theme_stylebox_override("background", _estilo(Color(0.1, 0.08, 0.08), Color.BLACK, 1, 6, 0))
+	barra.add_theme_stylebox_override("fill", _estilo(cor_barra, cor_barra, 0, 6, 0))
+	coluna.add_child(barra)
+	return painel
+
+
+func _paleta(c) -> Dictionary:
+	return paletas.get(c.id_carta.split("__")[0], {})
+
+
+func _tremer(no: Node3D) -> void:
+	var figura := no.get_node_or_null("Figura") as Node3D
+	if figura == null:
+		return
+	var tween := create_tween()
+	for dx in [0.1, -0.1, 0.07, -0.05, 0.0]:
+		tween.tween_property(figura, "position:x", dx, 0.05)
+
+
+func _process(delta: float) -> void:
+	tempo += delta
+	var k := 0
+	for no in cartas_3d.values():
+		var corpo := no.get_node_or_null("Figura/Corpo") as Node3D
+		if corpo != null and no.visible:
+			corpo.position.y = absf(sin(tempo * 2.6 + k * 1.3)) * 0.04
+		k += 1
+	if figura_inimigo != null:
+		var corpo := figura_inimigo.get_node_or_null("Figura/Corpo") as Node3D
+		if corpo != null and figura_inimigo.get_meta("vivo", true):
+			corpo.scale = Vector3(1.0 + sin(tempo * 2.0) * 0.025, 1.0 - sin(tempo * 2.0) * 0.025, 1.0)
 
 
 func _chave(c) -> String:
@@ -240,8 +342,8 @@ func _atualizar(animar: bool) -> void:
 	var destinos := {}
 	for i in em_campo.size():
 		var c = em_campo[i]
-		var altura := 0.35 if (modo == "ataque" and c == atacante_escolhido) else 0.0
-		destinos[c] = _pos_vaga(i) + Vector3(0, altura + 0.03, 0)
+		var altura := 0.3 if (modo == "ataque" and c == atacante_escolhido) else 0.0
+		destinos[c] = _pos_vaga(i) + Vector3(0, altura, 0)
 	# Quem acabou de cair desliza para o Cemitério e some sob a pilha.
 	for chave in cartas_3d.keys():
 		var no: Node3D = cartas_3d[chave]
@@ -256,7 +358,7 @@ func _atualizar(animar: bool) -> void:
 	for c in destinos:
 		var chave := _chave(c)
 		if not cartas_3d.has(chave):
-			var nova := _criar_carta_3d()
+			var nova := _criar_figura(Figuras.cavaleiro(_paleta(c), _cor_do_cavaleiro(c)), 1.85)
 			nova.position = POS_ENTRADA
 			cartas_3d[chave] = nova
 		objetos_3d[chave] = c
@@ -264,10 +366,10 @@ func _atualizar(animar: bool) -> void:
 		if not carta.visible:
 			carta.position = POS_ENTRADA
 			carta.visible = true
-		var estado := ""
+		var borda := Color(0.55, 0.45, 0.25)
 		if modo == "ataque" and opcoes_ataque.has(c):
-			estado = "destaque" if c == atacante_escolhido else "opcao"
-		_desenhar(carta, _face_cavaleiro(c, Vector2(PIXELS_CARTA), estado))
+			borda = Color(0.4, 1, 0.5) if c == atacante_escolhido else Color(0.4, 0.85, 1)
+		_desenhar(carta, _face_placa(_nome_curto(c), c.armadura_atual, c.armadura_maxima(), c.forca_total(), Color(0.3, 0.6, 1.0), borda))
 		if animar:
 			var tween := create_tween()
 			tween.tween_property(carta, "position", destinos[c], 0.4).set_trans(Tween.TRANS_CUBIC)
@@ -279,6 +381,7 @@ func _atualizar(animar: bool) -> void:
 	else:
 		_desenhar(pilha_cemiterio, _face_cavaleiro(jogador.cemiterio[-1], Vector2(PIXELS_CARTA), "caido"))
 	_desenhar(carta_encontro, _face_encontro(Vector2(PIXELS_CARTA)))
+	_atualizar_inimigo()
 	_atualizar_mao()
 	var itens := "nenhum"
 	if not jogador.itens_mao.is_empty():
@@ -287,10 +390,39 @@ func _atualizar(animar: bool) -> void:
 		_vez(jogador), jogador.reino_atual, jogador.moedas, jogador.inimigos, jogador.eventos, itens]
 
 
+## Inimigo em combate vira figura 3D com plaquinha; Eventos e Mercador ficam como carta.
+func _atualizar_inimigo() -> void:
+	var ini = partida.inimigo_atual
+	var em_combate: bool = ini != null and carta_revelada == ini.id
+	carta_encontro.visible = not em_combate
+	if not em_combate:
+		if figura_inimigo != null:
+			figura_inimigo.queue_free()
+			figura_inimigo = null
+		return
+	if figura_inimigo == null:
+		var escala := 1.75 if ini.eh_chefe() else 1.35
+		figura_inimigo = _criar_figura(Figuras.inimigo(ini.id, ini.eh_chefe()), 1.6)
+		figura_inimigo.position = POS_ENCONTRO
+		var figura: Node3D = figura_inimigo.get_node("Figura")
+		figura.scale = Vector3.ONE * escala
+		figura_inimigo.get_node("Placa").position.y = 1.55 * escala
+	_desenhar(figura_inimigo, _face_placa(ini.nome, ini.armadura_atual, ini.armadura_maxima, ini.forca_total(), Color(0.9, 0.2, 0.15), Color(0.9, 0.3, 0.2) if modo != "ataque" else Color(1, 0.85, 0.3)))
+	if not ini.vivo() and figura_inimigo.get_meta("vivo", true):
+		figura_inimigo.set_meta("vivo", false)
+		var tween := create_tween()
+		tween.tween_property(figura_inimigo.get_node("Figura"), "rotation_degrees:x", -85.0, 0.5).set_trans(Tween.TRANS_BOUNCE)
+		tween.parallel().tween_property(figura_inimigo.get_node("Placa"), "modulate:a", 0.0, 0.5)
+
+
 func _ao_revelar(carta_id: String) -> void:
 	carta_revelada = carta_id
 	armaduras_vistas.clear()
+	if figura_inimigo != null:
+		figura_inimigo.queue_free()
+		figura_inimigo = null
 	_desenhar(carta_encontro, _face_encontro(Vector2(PIXELS_CARTA)))
+	_atualizar_inimigo()
 	var tween := create_tween()
 	carta_encontro.scale = Vector3(0.2, 1, 0.2)
 	tween.tween_property(carta_encontro, "scale", Vector3(ESCALA_ENCONTRO, 1, ESCALA_ENCONTRO), 0.35).set_trans(Tween.TRANS_BACK)
@@ -309,14 +441,17 @@ func _mostrar_danos() -> void:
 	if ini != null:
 		var antes: int = armaduras_vistas.get("inimigo", ini.armadura_atual)
 		if ini.armadura_atual != antes:
-			_numero_flutuante(carta_encontro.position + Vector3(0, 0.6, 0), ini.armadura_atual - antes)
+			_numero_flutuante(POS_ENCONTRO + Vector3(0, 1.6, 0), ini.armadura_atual - antes)
+			if figura_inimigo != null:
+				_tremer(figura_inimigo)
 		armaduras_vistas["inimigo"] = ini.armadura_atual
 	for c in jogador.fila + jogador.cemiterio:
 		var chave := _chave(c)
 		var antes: int = armaduras_vistas.get(chave, c.armadura_atual)
 		var agora: int = c.armadura_atual if jogador.fila.has(c) else 0
 		if agora != antes and cartas_3d.has(chave):
-			_numero_flutuante(cartas_3d[chave].position + Vector3(0, 0.6, 0), agora - antes)
+			_numero_flutuante(cartas_3d[chave].position + Vector3(0, 1.3, 0), agora - antes)
+			_tremer(cartas_3d[chave])
 		armaduras_vistas[chave] = agora
 
 
@@ -789,7 +924,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 	if absf(direcao.y) < 0.001:
 		return
 	var ponto := origem + direcao * (-origem.y / direcao.y)
-	if _sob(ponto, carta_encontro, ESCALA_ENCONTRO):
+	if carta_revelada != "" and _sob_ponto(ponto, POS_ENCONTRO, ESCALA_ENCONTRO):
 		if modo == "ataque":
 			atacar()
 		else:
@@ -819,6 +954,10 @@ func _unhandled_input(evento: InputEvent) -> void:
 			return
 
 
+func _sob_ponto(ponto: Vector3, centro: Vector3, escala: float) -> bool:
+	return absf(ponto.x - centro.x) < TAM_CARTA_3D.x / 2 * escala and absf(ponto.z - centro.z) < TAM_CARTA_3D.y / 2 * escala
+
+
 func _sob(ponto: Vector3, no: Node3D, escala: float) -> bool:
 	return absf(ponto.x - no.position.x) < TAM_CARTA_3D.x / 2 * escala and absf(ponto.z - no.position.z) < TAM_CARTA_3D.y / 2 * escala
 
@@ -832,6 +971,15 @@ func atacar() -> void:
 	opcoes_ataque = []
 	atacante_escolhido = null
 	rotulo_dica.text = ""
+	var no = cartas_3d.get(_chave(quem))
+	if no != null:
+		# Pulinho em direção ao inimigo e volta.
+		var origem: Vector3 = no.position
+		var alvo := origem.lerp(POS_ENCONTRO, 0.55) + Vector3(0, 0.5, 0)
+		var tween := create_tween()
+		tween.tween_property(no, "position", alvo, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(no, "position", Vector3(origem.x, 0, origem.z), 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		await tween.finished
 	_atualizar(true)
 	decisor_atual.responder(quem)
 
@@ -852,7 +1000,7 @@ func _mostrar_detalhes_cavaleiro(c, onde: String) -> void:
 		texto += "\n\n[b]Equipamentos[/b]"
 		for item in c.equipamentos:
 			texto += "\n• %s: %s" % [item["nome"], item["efeito"]]
-	_mostrar_detalhes(texto)
+	_mostrar_detalhes(texto, _face_cavaleiro(c, Vector2(200, 280)))
 
 
 func _detalhes_do_encontro() -> String:
@@ -872,8 +1020,14 @@ func _detalhes_do_encontro() -> String:
 	return "[b]%s[/b]  (%s)%s\n\n[b]%s[/b]: %s" % [dados["nome"], dados["tipo"], estado, dados["habilidade"], dados["efeito"]]
 
 
-func _mostrar_detalhes(texto: String) -> void:
+func _mostrar_detalhes(texto: String, face: Control = null) -> void:
 	texto_detalhes.text = texto
+	for filho in carta_detalhes.get_children():
+		carta_detalhes.remove_child(filho)
+		filho.queue_free()
+	carta_detalhes.visible = face != null
+	if face != null:
+		carta_detalhes.add_child(face)
 	camada_detalhes.visible = true
 
 
@@ -1026,12 +1180,17 @@ func _criar_interface() -> void:
 	var detalhes := PanelContainer.new()
 	detalhes.add_theme_stylebox_override("panel", _estilo(Color(0.1, 0.1, 0.12, 0.97), COR_OURO, 3, 16, 18))
 	camada_detalhes.get_child(1).add_child(detalhes)
+	var linha_detalhes := HBoxContainer.new()
+	linha_detalhes.add_theme_constant_override("separation", 18)
+	detalhes.add_child(linha_detalhes)
+	carta_detalhes = CenterContainer.new()
+	linha_detalhes.add_child(carta_detalhes)
 	var coluna_detalhes := VBoxContainer.new()
-	detalhes.add_child(coluna_detalhes)
+	linha_detalhes.add_child(coluna_detalhes)
 	texto_detalhes = RichTextLabel.new()
 	texto_detalhes.bbcode_enabled = true
 	texto_detalhes.fit_content = true
-	texto_detalhes.custom_minimum_size = Vector2(620, 0)
+	texto_detalhes.custom_minimum_size = Vector2(520, 0)
 	coluna_detalhes.add_child(texto_detalhes)
 	var fechar := Button.new()
 	fechar.text = "Fechar"

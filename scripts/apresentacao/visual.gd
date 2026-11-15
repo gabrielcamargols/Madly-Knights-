@@ -372,7 +372,7 @@ static func tablado(pai: Node3D, posicoes_vagas: Array, pos_arena: Vector3) -> A
 		z += 0.52
 		k += 1
 	# Base de pedra em volta (blocos de alturas variadas).
-	var pedra_m := [mat(Color(0.66, 0.64, 0.6), 0.025), mat(Color(0.58, 0.57, 0.55), 0.025), mat(Color(0.72, 0.69, 0.63), 0.025)]
+	var pedra_m := [mat(Color(0.5, 0.49, 0.46), 0.025), mat(Color(0.44, 0.44, 0.43), 0.025), mat(Color(0.56, 0.53, 0.48), 0.025)]
 	var borda := []
 	var x := -largura / 2 - 0.3
 	while x <= largura / 2 + 0.3:
@@ -385,11 +385,12 @@ static func tablado(pai: Node3D, posicoes_vagas: Array, pos_arena: Vector3) -> A
 		borda.append(Vector3(largura / 2 + 0.3, 0, z))
 		z += 0.62
 	for p in borda:
-		var alto := rng.randf_range(0.28, 0.42)
-		peca(pai, caixa(Vector3(0.58, alto, 0.58)), pedra_m[rng.randi_range(0, 2)], p + Vector3(0, alto / 2 - 0.1, 0), Vector3(0, rng.randf_range(-6, 6), 0))
+		var alto := rng.randf_range(0.2, 0.3)
+		peca(pai, caixa(Vector3(0.56, alto, 0.5)), pedra_m[rng.randi_range(0, 2)], p + Vector3(0, alto / 2 - 0.1, 0), Vector3(0, rng.randf_range(-6, 6), 0))
 	# Arena do inimigo: círculo pintado em vermelho com aro de latão.
 	peca(pai, cilindro(1.42, 1.42, 0.03, 32), mat(Color(0.86, 0.66, 0.28), 0.0), pos_arena + Vector3(0, 0.055, 0))
-	peca(pai, cilindro(1.3, 1.3, 0.035, 32), mat(Color(0.55, 0.18, 0.14), 0.0), pos_arena + Vector3(0, 0.06, 0))
+	peca(pai, cilindro(1.3, 1.3, 0.035, 32), mat(Color(0.4, 0.17, 0.13), 0.0), pos_arena + Vector3(0, 0.06, 0))
+	peca(pai, cilindro(1.0, 1.0, 0.036, 32), mat(Color(0.47, 0.21, 0.15), 0.0), pos_arena + Vector3(0, 0.061, 0))
 	for kk in 8:
 		var a := TAU * kk / 8
 		peca(pai, esfera(0.06, 6, 3), mat(Color(0.86, 0.66, 0.28), 0.0, false, 0.5), pos_arena + Vector3(cos(a) * 1.36, 0.08, sin(a) * 1.36))
@@ -426,7 +427,7 @@ static func tablado(pai: Node3D, posicoes_vagas: Array, pos_arena: Vector3) -> A
 		ordem.modulate = Color(1.0, 0.85, 0.45) if i == 0 else Color(0.97, 0.9, 0.75)
 		ordem.outline_size = 12
 		ordem.outline_modulate = Color(0.2, 0.12, 0.06)
-		ordem.position = p + Vector3(0, 0.08, 0.78)
+		ordem.position = p + Vector3(0, 0.08, 0.72)
 		pai.add_child(ordem)
 		vagas.append({"aro": aro_m, "numero": numero})
 	# Setas pintadas da 1ª vaga até a arena: a ordem de ataque segue para o inimigo.

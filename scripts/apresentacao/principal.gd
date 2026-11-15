@@ -237,7 +237,7 @@ func _ajustar_camera() -> void:
 	if tamanho.x >= tamanho.y:
 		camera.keep_aspect = Camera3D.KEEP_HEIGHT
 		camera.fov = 40
-		camera.look_at_from_position(Vector3(0, 6.6, 5.0), Vector3(0, 0, -0.85))
+		camera.look_at_from_position(Vector3(0, 9.0, 6.6), Vector3(0, 0, -0.5))
 	else:
 		camera.keep_aspect = Camera3D.KEEP_WIDTH
 		camera.fov = 70
@@ -259,6 +259,7 @@ func _criar_carta_3d() -> Node3D:
 	quadro.size = TAM_CARTA_3D
 	malha.mesh = quadro
 	malha.rotation_degrees.x = -90
+	malha.position.y = 0.11  # acima das tábuas e da arena
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

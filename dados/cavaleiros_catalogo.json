@@ -1,0 +1,2872 @@
+{
+  "versao_catalogo": 1,
+  "jogo": "Madly Knights",
+  "manual_modo_contra": "https://chatgpt.com/library?file_id=libfile_a83b86a4ce008191bc5e16d8948ab42a&account_id=personal",
+  "cavaleiros": [
+    {
+      "id": "cavaleiro_banana",
+      "nome": "Cavaleiro Banana",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Escorregão Tático",
+        "descricao": "Uma vez por combate, quando um inimigo atacar, role 1D6. Com 5 ou 6, o ataque falha."
+      },
+      "fonte": {
+        "arquivo": "Carta final do Cavaleiro Banana.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_520d7e9ce6548191a699d3359af0e93e&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": [
+        "cavaleiro_banana__casca_escorregadia_2"
+      ]
+    },
+    {
+      "id": "cavaleiro_boxeador",
+      "nome": "Cavaleiro Boxeador",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Contra-Golpe",
+        "descricao": "Após sofrer dano, role 1D6. Com 5 ou 6, devolva o mesmo dano ao atacante."
+      },
+      "fonte": {
+        "arquivo": "Carta rubra do Cavaleiro Boxeador.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_07d519afeff481918176253d13d0691d&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": [],
+      "apelido_no_teste": "Boxeador Vermelho"
+    },
+    {
+      "id": "cavaleiro_pizza",
+      "nome": "Cavaleiro Pizza",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 6,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Rodízio Real",
+        "descricao": "Ao entrar em campo, todos os Cavaleiros aliados recuperam 2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Pizza na Festa Real.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_7beb75b69ac481918afd03181a7904e4&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": [
+        "cavaleiro_pizza__fatia_compartilhada_3"
+      ]
+    },
+    {
+      "id": "cavaleiro_pombo",
+      "nome": "Cavaleiro Pombo",
+      "cor": null,
+      "cor_sugerida": "Preto",
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Voo Rasante",
+        "descricao": "Após atacar, pode trocar de posição com outro Cavaleiro aliado."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Pombo em Voo Rasante.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_02aff2f0d188819187d9c6556d516adc&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_yeti",
+      "nome": "Cavaleiro Yeti",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Fúria do Yeti",
+        "descricao": "Na primeira vez que sofrer dano, recebe +2 de Força até o fim do combate."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Yeti da Neve.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_b834529f976c8191821ad281b8e9ce6f&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_pao_com_manteiga",
+      "nome": "Cavaleiro Pão com Manteiga",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Fila do Café",
+        "descricao": "Se for o segundo da fila, pode atacar no lugar do primeiro."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro pão com manteiga na padaria.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_bf95959d2664819198c4179a58a459c2&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_elegante",
+      "nome": "Cavaleiro Elegante",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 7,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Após Você",
+        "descricao": "Se for o primeiro da fila, o Cavaleiro seguinte pode atacar em seu lugar. Uma vez por turno."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro elegante no torneio.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_41645f8a76a481918e49d17a4c0d0818&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_mexicano",
+      "nome": "Cavaleiro Mexicano",
+      "cor": null,
+      "cor_sugerida": "Vermelho",
+      "origem_cor": "indeterminada",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 5,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Pimentita Malaguetita",
+        "descricao": "Ao atacar um inimigo, apimente-o até o fim da rodada. Cada vez que ele sofrer dano nessa rodada, recebe +1 de dano adicional."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro mexicano em batalha picante.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_932c882b465481919ef6db10230d417e&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": [
+        "cavaleiro_mexicano__grito_de_coragem_4"
+      ]
+    },
+    {
+      "id": "cavaleiro_rato",
+      "nome": "Cavaleiro Rato",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 1,
+      "armadura": 3,
+      "honra": 1,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Fome de Queijo",
+        "descricao": "Enquanto o Cavaleiro Queijo estiver na mesa, recebe +5 de Força."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Rato e o Gato Assustado.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_9712a465328081919ac7aa491dfb594b&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_queijo",
+      "nome": "Cavaleiro Queijo",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 2,
+      "armadura": 5,
+      "honra": 1,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Fedor Insuportável",
+        "descricao": "Se for o primeiro da fila, pode virar outra carta do baralho do Reino."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Queijo e o Fedor Insuportável.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_831a4f301b088191bc4cdd65e4d2a316&account_id=personal"
+      },
+      "grupo": "teste_historico",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_urso",
+      "nome": "Cavaleiro Urso",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 7,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Abraço Esmagador",
+        "descricao": "Quando atacar um Monstro, recebe +2 de Força durante esse combate."
+      },
+      "fonte": {
+        "arquivo": "carta cavaleiro urso centralizada(1).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e05016591dfc819189c44b303f382cd7&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_dragao",
+      "nome": "Cavaleiro Dragão",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Bafo pela Viseira",
+        "descricao": "Gaste 1 de Honra para causar 2 de dano a outro inimigo além do alvo principal."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro dragão em ação heroica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_8e7c576db9d881919b81ff55832ae63b&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_mosca",
+      "nome": "Cavaleiro Mosca",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 2,
+      "armadura": 3,
+      "honra": 1,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Zumbido Insuportável",
+        "descricao": "Ao entrar em campo, escolha um Inimigo. Ele recebe −2 de Força até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro mosca no mercado medieval.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_b54da72c1be08191b9c09ddb12a0d6ec&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_tigre",
+      "nome": "Cavaleiro Tigre",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Rajada de Garras",
+        "descricao": "Uma vez por turno, gaste 1 de Honra para realizar um segundo ataque com −1 de Força."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro tigre em pose heroica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_caaaf10b202481918cfda7acc4fe5daf&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_rinoceronte",
+      "nome": "Cavaleiro Rinoceronte",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 8,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Investida Blindada",
+        "descricao": "Antes de atacar, pode perder 2 de Armadura para receber +3 de Força durante esse combate."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro rinoceronte com faixa corrigida.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_8c6f84bf426c8191ba4f224dc25a4139&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_corvo",
+      "nome": "Cavaleiro Corvo",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Voo Tático",
+        "descricao": "Ao entrar em campo, pode trocar de posição com outro aliado. Se fizer isso, recebe +1 de Força até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Corvo enfrenta o dragão.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_bc8fa74ac61c819190d1ed464ea90024&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_palacio",
+      "nome": "Cavaleiro Palácio",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 2,
+      "armadura": 8,
+      "honra": 3,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Portões Fechados",
+        "descricao": "Uma vez por combate, quando um aliado receber dano, reduza esse dano em 2."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Palácio com joia safira.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_bb198b5bd4dc8191a05de2b9430fcfaa&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_palacio__guarda_do_trono_3"
+      ]
+    },
+    {
+      "id": "cavaleiro_queixo_rubro",
+      "nome": "Cavaleiro Queixo Rubro",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 5,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Queixo Inabalável",
+        "descricao": "Este Cavaleiro nunca pode ir para o final da fila."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro do Queixo Rubro.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_a4bb311a5a448191812b214838138016&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_rosquinha_de_chocolate",
+      "nome": "Cavaleiro Rosquinha de Chocolate",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Doce Recompensa",
+        "descricao": "Ao derrotar um inimigo, recupere 3 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro rosquinha de chocolate.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_f730497cf70481919599dfc88775c135&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "equinix",
+      "nome": "Equinix",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 10,
+      "armadura": 10,
+      "honra": 10,
+      "prestigio": 10,
+      "habilidade": {
+        "nome": "Equilíbrio Perfeito",
+        "descricao": "No fim de cada turno, restaure todos os status deste Cavaleiro para 10."
+      },
+      "fonte": {
+        "arquivo": "Equinix, cavaleiro do equilíbrio.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_bdd429851ebc819192b3a6bd2a7b9c45&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [],
+      "epiteto_no_manual": "Cavaleiro Equidino"
+    },
+    {
+      "id": "cavaleiros_siameses",
+      "nome": "Cavaleiros Siameses",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Ataque Sincronizado",
+        "descricao": "No ataque, role 2D6 e use o maior resultado. Se os dois forem iguais, cause +2 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiros siameses.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_6b6c239548ac8191b3928cd11dca1782&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_aranha",
+      "nome": "Cavaleiro Aranha",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Sentido Aranha",
+        "descricao": "Na primeira vez que sofrer dano em cada combate, role 1D6. Com 4, 5 ou 6, ignore esse dano."
+      },
+      "fonte": {
+        "arquivo": "Carta Cavaleiro Aranha com status oficiais.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_7ec03a4b15108191aeccbcceb55f773e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_arqueiro",
+      "nome": "Cavaleiro Arqueiro",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Cobertura Honrada",
+        "descricao": "Quando um Cavaleiro aliado atacar, pode dar +1 de Honra a ele até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro arqueiro salvando aliado.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_9b870d01324c81918abaeed2569be37e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_besouro",
+      "nome": "Cavaleiro Besouro",
+      "cor": null,
+      "cor_sugerida": "Preto",
+      "origem_cor": "indeterminada",
+      "forca": 4,
+      "armadura": 7,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Investida de Chifre",
+        "descricao": "Se for o primeiro da fila, recebe +2 de Força durante seu ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Besouro na Ponte Levadiça.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_4f61bb784fe8819195ecb901ccb75a60&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_besouro__investida_de_chifre_5"
+      ]
+    },
+    {
+      "id": "cavaleiro_bombado",
+      "nome": "Cavaleiro Bombado",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Força Bruta",
+        "descricao": "Com 5 ou 6 no ataque, cause 2 de dano adicional."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro bombado em ação.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_735d6fe60c0c8191bb0690537e9aaaf2&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_bruno",
+      "nome": "Cavaleiro Bruno",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Segunda Chance",
+        "descricao": "Uma vez por turno, quando outro aliado tirar 1 no ataque, ele pode rolar novamente."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Bruno e a segunda chance.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_dd554be9981c8191872d29cc11f8caa3&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_cachorro",
+      "nome": "Cavaleiro Cachorro",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Lealdade Inabalável",
+        "descricao": "Quando um aliado perder Armadura, este Cavaleiro pode receber 1 desse dano no lugar dele."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro cachorro em defesa heroica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_aa6dd07b61fc8191a058a4d2520dc8b9&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_careca_de_trancas",
+      "nome": "Cavaleiro Careca de Tranças",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Impulso das Tranças",
+        "descricao": "Depois que atacar, o próximo da fila recebe +2 de Força no ataque."
+      },
+      "fonte": {
+        "arquivo": "CAVALEIRO CARECA DE TRANÇAS.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_2418e2c8e5a08191b06b63625e0830b8&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_cavalo",
+      "nome": "Cavaleiro Cavalo",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Carga Desgovernada",
+        "descricao": "Ao entrar em campo, pode atacar imediatamente. Depois do ataque, vai para a última posição."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro cavalo em carga atrapalhada(1).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_da1d6e482e908191b0182a17a73cfd41&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_cavalo__galope_protetor_3"
+      ]
+    },
+    {
+      "id": "cavaleiro_cowboy",
+      "nome": "Cavaleiro Cowboy",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Tiro Certeiro",
+        "descricao": "Ao tirar 6 no ataque, o dano é triplicado."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Cowboy: Tiro certeiro.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_cf5d5339c3088191a40c3bc1ae59101b&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_cowboy__duelo_relampago_3",
+        "cavaleiro_cowboy__saque_relampago_5"
+      ]
+    },
+    {
+      "id": "cavaleiro_cosmico",
+      "nome": "Cavaleiro Cósmico",
+      "cor": null,
+      "cor_sugerida": "Preto",
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Constelação da Honra",
+        "descricao": "Ao entrar em campo, escolha até dois aliados. Eles recebem +1 de Honra até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro cósmico em batalha galáctica(1).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_5e5efbacb8c081919d4b2aae5dda47cf&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_dando_grau",
+      "nome": "Cavaleiro Dando Grau",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 1,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Grau Perfeito",
+        "descricao": "Ao tirar 6 no ataque, ganhe 3 moedas."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro dando grau.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_da00b6eb39608191a595ed4dfe25544b&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_de_patins",
+      "nome": "Cavaleiro de Patins",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Desvio sobre Rodas",
+        "descricao": "Uma vez por turno, ao sofrer dano, role 1D6. Com 5 ou 6, evite todo o dano e vá para o final da fila."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro de patins.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_73cdd812829881919587fd11536803e6&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_em_chamas",
+      "nome": "Cavaleiro em Chamas",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Armadura Incendiária",
+        "descricao": "Quando sofrer dano, o atacante também sofre 2 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro em chamas.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_fb1ee968626c8191b2d152c0cede5b6e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_esquilo",
+      "nome": "Cavaleiro Esquilo",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Reserva Generosa",
+        "descricao": "Ao entrar em campo, escolha um Cavaleiro aliado. Ele recebe +2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro esquilo defendendo aliado.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_aee34e7841c481919a09176192664c91&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_gabriel",
+      "nome": "Cavaleiro Gabriel",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 7,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Mensageiro Veloz",
+        "descricao": "Uma vez por turno, ao ir para o final da fila, escolha outro aliado para avançar uma posição."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Gabriel: Mensageiro Veloz.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d00d14494e848191a052e180fbb3ed32&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_gato",
+      "nome": "Cavaleiro Gato",
+      "cor": null,
+      "cor_sugerida": "Verde",
+      "origem_cor": "indeterminada",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Sete Vidas",
+        "descricao": "Na primeira vez em que seria derrotado, permanece em campo com 1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro gato preso na chaminé.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_7041f8fd08f88191bc3b94efcf5afabf&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_gatuno",
+      "nome": "Cavaleiro Gatuno",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 1,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Saque Felino",
+        "descricao": "Uma vez por turno, ao causar dano, ganhe 1 moeda. Se tirar 6, ganhe 3 moedas em vez disso."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro gatuno nos telhados.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ed1250d95bdc819199c679d3d9b8de97&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_gordinho",
+      "nome": "Cavaleiro Gordinho",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 7,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Barriga de Aço",
+        "descricao": "Uma vez por turno, reduza em 3 o dano recebido."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro gordinho.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_a3de66229aec8191b0d32ae808e96e80&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_lobo",
+      "nome": "Cavaleiro Lobo",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Chamado da Alcateia",
+        "descricao": "Ao entrar em campo, escolha um aliado para receber +2 de Força até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro lobo convocando filhotes.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ea3ad5be17708191a53d1f715be210a5&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_lucas",
+      "nome": "Cavaleiro Lucas",
+      "cor": "Âmbar",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 6,
+      "honra": 5,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Plano Improvisado",
+        "descricao": "Uma vez por turno, antes de atacar, pode trocar os valores de Força e Armadura até o fim da batalha."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro Lucas.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_9e5b4fed3b1c8191907d498491ce4263&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_mamute",
+      "nome": "Cavaleiro Mamute",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 7,
+      "honra": 3,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Proteger a Manada",
+        "descricao": "Uma vez por turno, quando ficar em primeiro na fila, o próximo recupera 2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Mamute.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_1412b575abec8191b5cd38b303ebc40e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_maca",
+      "nome": "Cavaleiro Maçã",
+      "cor": null,
+      "cor_sugerida": "Vermelho",
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Maçã do Dia",
+        "descricao": "Ao entrar em campo, cada Cavaleiro aliado recupera 1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Maçã contra a Lagarta.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_c6a24f64a5c48191be99a1b4ada7fab8&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_maca__casca_reforcada_2"
+      ]
+    },
+    {
+      "id": "cavaleiro_meca",
+      "nome": "Cavaleiro Meca",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 3,
+      "armadura": 7,
+      "honra": 2,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Superaquecimento",
+        "descricao": "Antes de atacar, pode ganhar +3 de Força nesse ataque. Se o fizer, perde 2 de Armadura depois."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro meca em batalha cômica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_0ad9c7a0dfe08191b594e151378bda1b&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_mercenario",
+      "nome": "Cavaleiro Mercenário",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 1,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Pelo Preço Certo",
+        "descricao": "Antes de atacar, pode pagar até 3 moedas e recebe +1 de Força para cada moeda paga neste ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro mercenário.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_06598d4cd8048191bda4857208ab77f8&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_nevasca",
+      "nome": "Cavaleiro Nevasca",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Frio Paralisante",
+        "descricao": "Ao causar dano, role 1D6. Com 5 ou 6, o alvo perde seu próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Carta Cavaleiro Nevasca com margem preta.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_0a0661abcfdc81918a66ff329a750af8&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_noir",
+      "nome": "Cavaleiro Noir",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Pista Decisiva",
+        "descricao": "Uma vez por turno, olhe a próxima carta do Reino. Pode mantê-la no topo ou colocá-la no fundo."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro noir na chuva.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_57359b1cdf548191b25b6de17ec68261&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_pescotapa",
+      "nome": "Cavaleiro Pescotapa",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Pescotapa Atordoante",
+        "descricao": "Uma vez por turno, ao causar dano, o alvo recebe −2 de Força no próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Pescotapa em ação.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_34dc53c48d9881919e9f71d00c13bb0f&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_pinoquio",
+      "nome": "Cavaleiro Pinóquio",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Mentira Convincente",
+        "descricao": "Uma vez por turno, aumente em 1 o resultado do dado de ataque, até o máximo de 6."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Pinóquio.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ae4d1d21f870819182447f057d1a14c6&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_pinoquio__fios_de_truque_2"
+      ]
+    },
+    {
+      "id": "cavaleiro_pistache",
+      "nome": "Cavaleiro Pistache",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 6,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Casca Protetora",
+        "descricao": "Uma vez por partida, quando seria derrotado, permanece com 1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Pistache.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_cdf2ff09c72481918960de1bad3269ef&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_praiano",
+      "nome": "Cavaleiro Praiano",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Descanso Merecido",
+        "descricao": "Quando for para o banco, recupere 3 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro praiano na batalha costeira.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3c69b9336e688191bb19f66945d49ecc&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_praiano__energia_de_verao_2"
+      ]
+    },
+    {
+      "id": "cavaleiro_radical",
+      "nome": "Cavaleiro Radical",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Sem Freio",
+        "descricao": "Ao tirar 6 no ataque, ataque novamente e depois vá para o final da fila. Uma vez por turno."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro radical.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_5664fa4e17d88191980fb063445d7e51&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_raposa_do_deserto",
+      "nome": "Cavaleiro Raposa do Deserto",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 7,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Ouvidos do Deserto",
+        "descricao": "Uma vez por turno, antes de virar uma carta do Reino, olhe as duas primeiras. Escolha qual virar e coloque a outra no fundo."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro raposa do deserto.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_29a4f5fbb3088191bcb7d69329b30ef5&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_raposa_tibetana",
+      "nome": "Cavaleiro Raposa Tibetana",
+      "cor": "Turquesa",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 6,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Paciência do Planalto",
+        "descricao": "Se começar o turno no final da fila, recebe +3 de Força em seu próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro raposa tibetana no planalto.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_c6536a399b308191a5d33de228e00dcf&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_relampago",
+      "nome": "Cavaleiro Relâmpago",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 5,
+      "armadura": 2,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Ataque Relâmpago",
+        "descricao": "Ao entrar em campo, pode atacar imediatamente com −1 de Força nesse ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro relâmpago em ação.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_2fc9b140c06c819195165f005bca136a&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_relampago__arrancada_eletrica_4"
+      ]
+    },
+    {
+      "id": "cavaleiro_robotico",
+      "nome": "Cavaleiro Robótico",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 4,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Protocolo Protetor",
+        "descricao": "Quando um aliado sofrer dano, pode trocar de posição com ele e receber o dano em seu lugar."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro robótico salvando galinha.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_7996a4d15e4481918ee8a07e71c6bded&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_steampunk",
+      "nome": "Cavaleiro Steampunk",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Pressão Máxima",
+        "descricao": "Uma vez por turno, antes de atacar, pode ganhar +3 de Força nesse ataque. Depois sofre 2 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Steampunk.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_c55a2affefc48191925658a37be40e2d&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_tesla",
+      "nome": "Cavaleiro Tesla",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Armadura Condutora",
+        "descricao": "Quando sofrer dano de um ataque, cause 1 de dano ao atacante."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro tesla enfrentando aranha mecânica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_cb014bc259548191b04d67c0d05313d6&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_tesla__corrente_partilhada_3"
+      ]
+    },
+    {
+      "id": "cavaleiro_tubarao",
+      "nome": "Cavaleiro Tubarão",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Instinto Predador",
+        "descricao": "Ao atacar um inimigo com 4 ou menos de Armadura, recebe +2 de Força durante o ataque."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro tubarão em ataque naval.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e597846088688191bf0890e1f5085bee&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_vaca",
+      "nome": "Cavaleiro Vaca",
+      "cor": null,
+      "cor_sugerida": null,
+      "origem_cor": "indeterminada",
+      "forca": 2,
+      "armadura": 6,
+      "honra": 4,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Muralha do Rebanho",
+        "descricao": "Ao entrar em campo, cada outro aliado recebe +1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro vaca protegendo aliados(1).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d2b725f8d8a0819193fa7ab2eaaec2b9&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_da_faxina",
+      "nome": "Cavaleiro da Faxina",
+      "cor": null,
+      "cor_sugerida": "Branco",
+      "origem_cor": "indeterminada",
+      "forca": 2,
+      "armadura": 5,
+      "honra": 5,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Limpeza Geral",
+        "descricao": "Ao entrar em campo, remova todos os efeitos negativos de um aliado."
+      },
+      "fonte": {
+        "arquivo": "Carta completa do Cavaleiro da Faxina.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3b8df38017148191af61c70940fa34f1&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_do_cha_da_tarde",
+      "nome": "Cavaleiro do Chá da Tarde",
+      "cor": "Turquesa",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 7,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Pausa para o Chá",
+        "descricao": "Uma vez por turno, em vez de atacar, pode recuperar 4 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Carta do cavaleiro do chá.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_af1bfb94badc81919fba6d621c025460&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_hockey",
+      "nome": "Cavaleiro Hockey",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 3,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Jogada de Corpo",
+        "descricao": "Ao tirar 5 ou 6 no ataque, o alvo causa 2 de dano a menos no próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro Hockey corrigida.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_030dc03c37688191b44069823f80a54f&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "husky_cavaleiro",
+      "nome": "Husky Cavaleiro",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Uivo da Matilha",
+        "descricao": "Uma vez por turno, escolha outro aliado. Ele recebe +2 de Força no próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Carta do Husky Cavaleiro.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_94c4a458f32881918d76bdad0447b5e4&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_bardo",
+      "nome": "Cavaleiro Bardo",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 6,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Refrão Heroico",
+        "descricao": "Uma vez por turno, após atacar, o próximo da fila recebe +2 de Força no próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro bardo em batalha musical.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_70c2bbca621481918fff98fb51601cb5&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_beisebol",
+      "nome": "Cavaleiro Beisebol",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Home Run",
+        "descricao": "Se tirar 6 no ataque, pode atacar novamente. Uma vez por turno."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro beisebol: home run no castelo.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3cefdedf30548191825664636b929708&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_bumerangue",
+      "nome": "Cavaleiro Bumerangue",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Efeito Bumerangue",
+        "descricao": "Quando vencer uma batalha, volta para o início em vez de ir para o final da fila."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro bumerangue em retorno triunfal.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e745d3643d3c81919966a836f9beb32c&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_caipira",
+      "nome": "Cavaleiro Caipira",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 5,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Gambiarra da Roça",
+        "descricao": "Uma vez por combate, ao sofrer dano, recupere 3 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Caipira e o javali voador.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_8e43bba53254819188179f4d8b78d52f&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_chocotone",
+      "nome": "Cavaleiro Chocotone",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Chocolate Quente",
+        "descricao": "Uma vez por turno, quando sofrer dano, o atacante sofre 2 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Chocotone na Forja de Chocolate.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_a5855b25530c8191898a4091ff54a80e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_futebol",
+      "nome": "Cavaleiro Futebol",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Jogada Ensaiada",
+        "descricao": "Ao entrar em campo, mova um aliado para qualquer posição. Ele recebe +1 de Armadura até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "cavaleiro chutando na arena medieval.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_359e1209d92481919df4a517ff4f50dd&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": [
+        "cavaleiro_futebol__passe_decisivo_3"
+      ]
+    },
+    {
+      "id": "cavaleiro_cogumelo",
+      "nome": "Cavaleiro Cogumelo",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 7,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Regeneração Fúngica",
+        "descricao": "No fim do turno, se tiver sofrido dano, recupere 2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Cogumelo contra a Lesma.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_f2b011aca60c819194b66b3411215931&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_dentes_de_sabre",
+      "nome": "Cavaleiro Dentes de Sabre",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Predador Ancestral",
+        "descricao": "Ao atacar inimigo com mais Armadura que ele, recebe +3 de Força nesse ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro dentes de sabre.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_2681873304d88191983e56c869f58342&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_do_rolima",
+      "nome": "Cavaleiro do Rolimã",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Descida sem Freio",
+        "descricao": "Se estiver em primeiro na fila, recebe +3 de Força no ataque. Depois, vai para o final da fila."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro do rolimã em disparada.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_b975169658188191a421581f00562697&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_duelista",
+      "nome": "Cavaleiro Duelista",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 6,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Truque de Capa",
+        "descricao": "Uma vez por duelo, após rolar o dado de ataque, aumente ou diminua o resultado em 1."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro duelista em duelo lunar.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e5863a1af1f48191bf54a1feb6644c1c&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_felipe",
+      "nome": "Cavaleiro Felipe",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Ataque sem Freio",
+        "descricao": "Uma vez por turno, antes de atacar, pode reduzir sua Armadura em 2 para receber +3 de Força até o fim da batalha."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Felipe voa contra o troll.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_1a1e5ee907f08191b7571608af734352&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_foguete",
+      "nome": "Cavaleiro Foguete",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Foguete Desgovernado",
+        "descricao": "Ao tirar 1 no ataque, causa 3 de dano e vai para o final da fila. Uma vez por turno."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro foguete em voo caótico.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_062a778a8be48191abcf0d8919ed16fd&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_galinha",
+      "nome": "Cavaleiro Galinha",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Ovo de Ouro",
+        "descricao": "No início do seu turno, role 1D6. Com 5 ou 6, ganhe 2 moedas."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro galinha protege os pintinhos.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_910c2728fd7c8191ab00b7c1844a0ec8&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_icegurt",
+      "nome": "Cavaleiro Icegurt",
+      "cor": "Turquesa",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 6,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Frio Cremoso",
+        "descricao": "Uma vez por turno, depois de causar dano, o inimigo recebe −2 de Força até o fim da batalha."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Icegurt congela o dragão.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_73f47140f1b88191b3669ff238d04d1a&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_joaninha",
+      "nome": "Cavaleiro Joaninha",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 6,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Sete Pontos de Sorte",
+        "descricao": "Uma vez por turno, ao rolar 1 no ataque, role novamente e use o novo resultado."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro joaninha em ação.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ba1c75a5eba08191ad111151e816c59e&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_origami",
+      "nome": "Cavaleiro Origami",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 5,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Forma Adaptável",
+        "descricao": "Uma vez por turno, antes de atacar, escolha entre +2 de Força nesse ataque ou recuperar 2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Origami no Scriptorium.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_c5f60751cabc8191b4b47fd692c1d227&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_padeiro",
+      "nome": "Cavaleiro Padeiro",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Pão Quentinho",
+        "descricao": "Uma vez por turno, em vez de atacar, escolha outro aliado para recuperar 4 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro padeiro contra o golem de pão.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_faee05808fb88191ac63c0b10e9b59f4&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_panetone",
+      "nome": "Cavaleiro Panetone",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Partilha Festiva",
+        "descricao": "Uma vez por turno, quando for para o final da fila, o próximo recupera 2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Panetone defende a padaria.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e5de1ebe64e48191b2d826e5615f812b&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_poodle",
+      "nome": "Cavaleiro Poodle",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 7,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Tosa de Batalha",
+        "descricao": "Na primeira vez que sofrer dano em cada turno, reduza esse dano em 2."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Poodle no Jardim Real.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_f5509ab1c02481918a3bad1183d65431&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_samurai",
+      "nome": "Cavaleiro Samurai",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 5,
+      "honra": 7,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Contra-Ataque",
+        "descricao": "Uma vez por turno, ao sofrer dano, role 1D6. Com 5 ou 6, cause 3 de dano ao atacante."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Samurai em Contra-Ataque.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_b89b9f331fb0819185f588dfdcc49e5f&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_t_rex",
+      "nome": "Cavaleiro T-Rex",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 6,
+      "honra": 2,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Mordida Colossal",
+        "descricao": "Ao tirar 5 ou 6 no ataque, cause +2 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro T-Rex: mordida colossal.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_1a73a18a5efc8191971d8e2ef74fe2f3&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_tokusatsu",
+      "nome": "Cavaleiro Tokusatsu",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 6,
+      "honra": 5,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Transformação Relâmpago",
+        "descricao": "Uma vez por batalha, quando sua Armadura chegar a 4 ou menos, recebe +4 de Força até o fim da batalha."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Tokusatsu em batalha elétrica.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_fa5d1637523c8191893c72e701f7e570&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_tropeiro",
+      "nome": "Cavaleiro Tropeiro",
+      "cor": "Âmbar",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Provisões de Viagem",
+        "descricao": "Sempre que sobreviver a um Evento, ganhe 1 moeda adicional."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Tropeiro contra o Tatu Couraçado.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ab9fafdfd10881919c46385ac6007cba&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_topeira",
+      "nome": "Cavaleiro Topeira",
+      "cor": "Marrom",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Túnel Secreto",
+        "descricao": "Uma vez por turno, se estiver no final da fila, troque de posição com o Cavaleiro à sua frente."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro-toupeira no túnel secreto.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_6fd8af40caa0819185c330872b4c6fbd&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "coelho_cavaleiro",
+      "nome": "Coelho Cavaleiro",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 6,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Pés Ligeiros",
+        "descricao": "Uma vez por turno, ao tirar 1 no ataque, role novamente."
+      },
+      "fonte": {
+        "arquivo": "Coelho Cavaleiro.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_dcf5e65dfda88191b75f18518bfb5597&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "sapo_cavaleiro",
+      "nome": "Sapo Cavaleiro",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Salto Ágil",
+        "descricao": "Ao chegar ao final da fila, pode avançar uma posição."
+      },
+      "fonte": {
+        "arquivo": "Sapo Cavaleiro salta sobre o crocodilo.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_a06ee00a6430819182639e985f0f2af2&account_id=personal"
+      },
+      "grupo": "outras_cartas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_bakugan",
+      "nome": "Cavaleiro Bakugan",
+      "cor": "Âmbar",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Esfera de Batalha",
+        "descricao": "Uma vez por turno, antes de atacar, role 1D6. Com 1–3, +2 de Armadura até o fim do turno. Com 4–6, +3 de Força nesse ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Bakugan e dragão mecânico.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_23d1ca1f4ce08191ae892a9b0a7c5ac4&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_death_note",
+      "nome": "Cavaleiro Death Note",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 6,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Nome no Caderno",
+        "descricao": "Uma vez por reino, descarte o inimigo revelado sem lutar, sem moedas e sem contar a derrota para avançar."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro do Caderno Amaldiçoado.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_8e8990dfabb88191822e8b839f2d73f9&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_one_punch_man",
+      "nome": "Cavaleiro One Punch Man",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 6,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Soco Único",
+        "descricao": "Ao rolar 6 contra um Inimigo, derrote-o imediatamente. Contra Bosses, cause +6 de dano."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro do soco único.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d6abca6c06c08191aa74aa0d8e53cd7c&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_perna_flamejante",
+      "nome": "Cavaleiro Perna Flamejante",
+      "cor": "Âmbar",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 3,
+      "honra": 6,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Chute Flamejante",
+        "descricao": "Com 4, 5 ou 6 no ataque, cause 2 de dano adicional."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Perna Flamejante.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_5aa459ab89048191b0c8e64a9da3ee24&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_do_chapeu_de_palha",
+      "nome": "Cavaleiro do Chapéu de Palha",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 3,
+      "honra": 6,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Corpo Elástico",
+        "descricao": "Na primeira vez que sofrer dano em cada turno, reduza esse dano pela metade, arredondando para baixo."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro do Chapéu de Palha.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_c60fa814791c8191960c09afaba4361f&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_yu_gi_oh",
+      "nome": "Cavaleiro Yu Gi Oh",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 6,
+      "prestigio": 6,
+      "habilidade": {
+        "nome": "Coração do Baralho",
+        "descricao": "Uma vez por turno, antes de atacar, descarte um Cavaleiro da mão para receber +3 de Força nesse ataque."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro e Quimera Dourada.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3cd06e8fdd58819193f8ac164083c53b&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_jojo",
+      "nome": "Cavaleiro JoJo",
+      "cor": "Roxo",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Espírito de Combate",
+        "descricao": "Uma vez por turno, quando sofrer dano, role 1D6. Com 5 ou 6, anule o dano."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro JoJo totalmente enquadrada.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_b8574b92dda08191bb062626a9bec4b7&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_slam_dunk",
+      "nome": "Cavaleiro Slam Dunk",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 6,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 4,
+      "habilidade": {
+        "nome": "Rebote Decisivo",
+        "descricao": "Uma vez por turno, quando um aliado tirar 1 no ataque, este Cavaleiro pode atacar imediatamente."
+      },
+      "fonte": {
+        "arquivo": "Carta do Cavaleiro Slam Dunk.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_13014319ecd88191a85ca6f8643b1682&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_jedi",
+      "nome": "Cavaleiro Jedi",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 7,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Impulso da Força",
+        "descricao": "Uma vez por turno, antes de atacar, mova um aliado para qualquer posição da fila."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Jedi na ponte lunar.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_958cd9a8340881919bfdf6d0ddfa3c93&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_santoryu",
+      "nome": "Cavaleiro Santoryu",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 7,
+      "armadura": 5,
+      "honra": 4,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Corte de Três Lâminas",
+        "descricao": "Uma vez por turno, ao atacar, role 3D6 e use o maior resultado. Depois do ataque, perca 1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro Santoryu contra o ogro marinho.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d135f935948081919142953f6a1d376e&account_id=personal"
+      },
+      "grupo": "homenagens",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_buraco_negro",
+      "nome": "Cavaleiro Buraco Negro",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Gravidade em Cadeia",
+        "descricao": "Sempre que outro aliado atacar, este recebe +1 de Força até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-1(78).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d7d45b8dbf9481918ce82d6550deb121&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_ninja",
+      "nome": "Cavaleiro Ninja",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Passo Fantasma",
+        "descricao": "Troque este Cavaleiro de lugar com um aliado. Se ele atacar neste turno, recebe +1 de Força e evita contra-ataques de monstros."
+      },
+      "fonte": {
+        "arquivo": "image-gen-1(81).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e4ae3e569088819182388b24f72f9a1e&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_cavaleiro",
+      "nome": "Cavaleiro Cavaleiro",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Exemplo de Honra",
+        "descricao": "Escolha um aliado. Ele recebe +2 de Honra."
+      },
+      "fonte": {
+        "arquivo": "image-gen-2(79).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_79d2af6832a08191ba73ad0a8ae0cc72&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_sortudo",
+      "nome": "Cavaleiro Sortudo",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Golpe de Sorte",
+        "descricao": "Revele o topo do seu baralho. Se for Cavaleiro, compre-o. Em outro caso, este Cavaleiro recebe +2 de Força até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-2(81).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_175934509ac881918ac63a7e1d2e51e6&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_pato",
+      "nome": "Cavaleiro Pato",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Quá Valente",
+        "descricao": "Se atacar um monstro e sobreviver, ganhe +1 de Honra. Se já tiver 4 ou mais de Honra, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-2(82).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_18a83ffeb2948191a85af419b7078185&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_rei",
+      "nome": "Cavaleiro Rei",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 4,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Comando Real",
+        "descricao": "Escolha até dois aliados. Cada um recebe +1 de Honra."
+      },
+      "fonte": {
+        "arquivo": "image-gen-3(71).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_7b4477bd44b88191ab205e0bd0168974&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_surfista",
+      "nome": "Cavaleiro Surfista",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Onda de Manobra",
+        "descricao": "Troque de lugar até dois Cavaleiros. Um recebe +1 de Armadura e pode atacar monstros da retaguarda neste turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-3(73).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_996bd2b56a388191986cb6bdab9138e2&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_pinguim",
+      "nome": "Cavaleiro Pinguim",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Frio Protetor",
+        "descricao": "Escolha um aliado. Ele recebe +2 de Armadura até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(65).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d459f873a4e08191a8f4d38fa6e53145&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": [
+        "cavaleiro_pinguim__banco_de_gelo_2"
+      ]
+    },
+    {
+      "id": "cavaleiro_das_neves",
+      "nome": "Cavaleiro das Neves",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Tempestade Branca",
+        "descricao": "Escolha um monstro. Ele perde 2 de Força até o fim do turno. Se já estiver ferido, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(67).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_eadc8a322b5081918fdbc0da8ec1334d&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_siames",
+      "nome": "Cavaleiro Siamês",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Passos Silenciosos",
+        "descricao": "Olhe as duas cartas do topo do seu baralho. Coloque uma na mão e outra no fundo."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(68).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_07bc0408455c8191aa07e5a65970d59d&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_slime",
+      "nome": "Cavaleiro Slime",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 5,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Divisão Pegajosa",
+        "descricao": "Quando sofrer dano e sobreviver, escolha um aliado para receber +1 de Armadura. Se foi um monstro que causou dano, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-5(46).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ff205e3d39448191bd5017ebcb3a291b&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_tribal",
+      "nome": "Cavaleiro Tribal",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Tambor Ancestral",
+        "descricao": "Escolha até dois aliados. Um recebe +1 de Força e o outro recebe +1 de Armadura até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-5(47).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_667bb7b6769481919a454a6e253e74bc&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "raposa_cavaleiro",
+      "nome": "Raposa Cavaleiro",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Astúcia da Raposa",
+        "descricao": "Depois de trocar de lugar com um aliado, compre uma carta. Se atacar neste turno, recebe +1 de Força."
+      },
+      "fonte": {
+        "arquivo": "image-gen-6(39).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3459be7b372481919caf42c9c6925247&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleira",
+      "nome": "Cavaleira",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Bravura Inspiradora",
+        "descricao": "Escolha um aliado para receber +1 de Honra. Se ele derrotar um monstro neste turno, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-7(23).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_49e2c82df7c88191909278b9923c595c&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_triceratops",
+      "nome": "Cavaleiro Triceratops",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Carga de Chifres",
+        "descricao": "Ao ser movido para a vanguarda, recebe +2 de Força até o fim do turno. Se atacar um monstro e sobreviver, escolha um aliado para receber +1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "image-gen-3(75).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_04d839645dcc8191990ab799588dbebd&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    },
+    {
+      "id": "cavaleiro_coxinha",
+      "nome": "Cavaleiro Coxinha",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Lanche de Intervalo",
+        "descricao": "Coloque um Cavaleiro seu no banco. No fim do turno, cure 2 de Armadura dele. Se ele for amarelo ou branco, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(69).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_04c48c6075a48191893cbb8e74b9057d&account_id=personal"
+      },
+      "grupo": "cartas_antigas",
+      "variantes": []
+    }
+  ],
+  "variantes": [
+    {
+      "id": "cavaleiro_banana__casca_escorregadia_2",
+      "nome": "Cavaleiro Banana",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Casca Escorregadia",
+        "descricao": "O próximo monstro que o atacar recebe −2 de Força. Se o ataque não causar dano, compre uma carta."
+      },
+      "fonte": {
+        "arquivo": "image-gen-3(74).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_117978e746c48191ab1707dd51ceae17&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_banana"
+    },
+    {
+      "id": "cavaleiro_pizza__fatia_compartilhada_3",
+      "nome": "Cavaleiro Pizza",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Fatia Compartilhada",
+        "descricao": "Escolha um aliado para receber +1 de Honra. Se ele já tiver 4 ou mais de Armadura, recebe também +1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "image-gen-6(37).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_678cc2675a108191a014796a695ee5b5&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_pizza"
+    },
+    {
+      "id": "cavaleiro_mexicano__grito_de_coragem_4",
+      "nome": "Cavaleiro Mexicano",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 4,
+      "armadura": 4,
+      "honra": 5,
+      "prestigio": 3,
+      "habilidade": {
+        "nome": "Grito de Coragem",
+        "descricao": "Uma vez por turno, quando um aliado sofrer dano, este Cavaleiro recebe +2 de Força no próximo ataque."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro mexicano reúne aliados.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_491235edab548191aee97a543176d7e1&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_mexicano"
+    },
+    {
+      "id": "cavaleiro_palacio__guarda_do_trono_3",
+      "nome": "Cavaleiro Palácio",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 5,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Guarda do Trono",
+        "descricao": "Se estiver no centro, aliados recebem +1 de Armadura. Pode ocupar a posição de um aliado derrotado."
+      },
+      "fonte": {
+        "arquivo": "image-gen-1(82).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_9e2d2d388cc08191890f14bc804422e9&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_palacio"
+    },
+    {
+      "id": "cavaleiro_tesla__corrente_partilhada_3",
+      "nome": "Cavaleiro Tesla",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Corrente Partilhada",
+        "descricao": "Escolha um aliado. Quando ele atacar neste turno, este causa também 1 de dano ao mesmo alvo."
+      },
+      "fonte": {
+        "arquivo": "image-gen-2(78).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_e08392d60f7081919fc6aec4fb9a891c&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_tesla"
+    },
+    {
+      "id": "cavaleiro_cavalo__galope_protetor_3",
+      "nome": "Cavaleiro Cavalo",
+      "cor": "Branco",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Galope Protetor",
+        "descricao": "Escolha um aliado para receber +1 de Honra e +1 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "image-gen-1(79).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_45483a4330fc819191cb78f0642ee525&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_cavalo"
+    },
+    {
+      "id": "cavaleiro_futebol__passe_decisivo_3",
+      "nome": "Cavaleiro Futebol",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Passe Decisivo",
+        "descricao": "Escolha um aliado. Se ele atacar neste turno, este Cavaleiro pode atacar logo depois."
+      },
+      "fonte": {
+        "arquivo": "image-gen-3(70).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_644e062205988191bca1034ad741ce58&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_futebol"
+    },
+    {
+      "id": "cavaleiro_relampago__arrancada_eletrica_4",
+      "nome": "Cavaleiro Relâmpago",
+      "cor": "Amarelo",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 4,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Arrancada Elétrica",
+        "descricao": "Se outro aliado atacar antes dele neste turno, pode atacar imediatamente com +2 de Força."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(64).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_29fc366c7f108191be8b89e9f725c61b&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_relampago"
+    },
+    {
+      "id": "cavaleiro_pinguim__banco_de_gelo_2",
+      "nome": "Cavaleiro Pinguim",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Banco de Gelo",
+        "descricao": "Coloque um Cavaleiro seu no banco. No próximo turno, ele volta com +2 de Armadura."
+      },
+      "fonte": {
+        "arquivo": "image-gen-4(66).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_464e95eb327c8191ba91123c1e669f2e&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_pinguim"
+    },
+    {
+      "id": "cavaleiro_praiano__energia_de_verao_2",
+      "nome": "Cavaleiro Praiano",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Energia de Verão",
+        "descricao": "Escolha um aliado para recuperar 1 de Armadura. Se atacar neste turno, recebe +1 de Força."
+      },
+      "fonte": {
+        "arquivo": "image-gen-5(43).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_d940feef15708191a3b701b44dd26d0f&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_praiano"
+    },
+    {
+      "id": "cavaleiro_maca__casca_reforcada_2",
+      "nome": "Cavaleiro Maçã",
+      "cor": "Verde",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Casca Reforçada",
+        "descricao": "Escolha um aliado para receber +1 de Armadura e +1 de Honra."
+      },
+      "fonte": {
+        "arquivo": "image-gen-5(44).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_6170ccb674348191852df893955f2c7f&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_maca"
+    },
+    {
+      "id": "cavaleiro_cowboy__duelo_relampago_3",
+      "nome": "Cavaleiro Cowboy",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 3,
+      "armadura": 3,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Duelo Relâmpago",
+        "descricao": "Ao entrar, escolha um monstro ou Cavaleiro de Força até 4. Se atacar esse alvo neste turno, ganha +2 de Força. Se derrotá-lo, ganha +1 de Honra."
+      },
+      "fonte": {
+        "arquivo": "image-gen-1(83).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3be746adb010819191f4a00b035eef73&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_cowboy"
+    },
+    {
+      "id": "cavaleiro_cowboy__saque_relampago_5",
+      "nome": "Cavaleiro Cowboy",
+      "cor": "Vermelho",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 5,
+      "habilidade": {
+        "nome": "Saque Relâmpago",
+        "descricao": "Na primeira rodada do combate, ataca antes de todos. O usuário pediu troca dessa habilidade."
+      },
+      "fonte": {
+        "arquivo": "Cavaleiro cowboy.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_3e29a3e408988191b676da397bbc7ef5&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_cowboy"
+    },
+    {
+      "id": "cavaleiro_pinoquio__fios_de_truque_2",
+      "nome": "Cavaleiro Pinóquio",
+      "cor": "Azul",
+      "cor_sugerida": null,
+      "origem_cor": "texto_impresso",
+      "forca": 2,
+      "armadura": 4,
+      "honra": 2,
+      "prestigio": 1,
+      "habilidade": {
+        "nome": "Fios de Truque",
+        "descricao": "Olhe as três cartas do topo. Coloque uma na mão, uma no fundo e descarte uma. Se a comprada for Cavaleiro, este recebe +1 de Armadura até o fim do turno."
+      },
+      "fonte": {
+        "arquivo": "image-gen-2(83).png",
+        "url": "https://chatgpt.com/library?file_id=libfile_5db719195c6c8191b3e8c865780c9dcb&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_pinoquio"
+    },
+    {
+      "id": "cavaleiro_besouro__investida_de_chifre_5",
+      "nome": "Cavaleiro Besouro",
+      "cor": "Preto",
+      "cor_sugerida": null,
+      "origem_cor": "identidade_visual",
+      "forca": 5,
+      "armadura": 7,
+      "honra": 3,
+      "prestigio": 2,
+      "habilidade": {
+        "nome": "Investida de Chifre",
+        "descricao": "Na primeira posição da fila, recebe +2 de Força durante o ataque."
+      },
+      "fonte": {
+        "arquivo": "Investida do Cavaleiro Besouro.png",
+        "url": "https://chatgpt.com/library?file_id=libfile_ebe74258e1d08191b878bf34d79d270c&account_id=personal"
+      },
+      "cavaleiro_id": "cavaleiro_besouro"
+    }
+  ],
+  "referencias_pendentes": [
+    {
+      "nome": "Cavaleiro Cerberus",
+      "forca": null,
+      "armadura": null,
+      "honra": null,
+      "prestigio": null,
+      "cor": null,
+      "registro": "O manual §13 permite três capacetes.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_a83b86a4ce008191bc5e16d8948ab42a&account_id=personal"
+    }
+  ],
+  "baralho_teste_historico": [
+    {
+      "id": "cavaleiro_banana",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_boxeador",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pizza",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pombo",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_yeti",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pao_com_manteiga",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_elegante",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_mexicano",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_rato",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_queijo",
+      "copias": 2
+    }
+  ],
+  "baralho_sugerido_solo_3d": [
+    {
+      "id": "cavaleiro_banana",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pizza",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pao_com_manteiga",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_rato",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_queijo",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_mosca",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_palacio",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_bruno",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_beisebol",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_tesla",
+      "copias": 2
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "circuito": [
+    {
+      "reino": "Reino das Panquecas",
+      "chefe": "imperador_panqueca"
+    },
+    {
+      "reino": "Pântano Maluco",
+      "chefe": "barao_do_pantano"
+    },
+    {
+      "reino": "Reino dos Cavaleiros",
+      "chefe": "sir_apelao"
+    },
+    {
+      "reino": "Portal Temporal",
+      "chefe": "cronarca_do_portal"
+    },
+    {
+      "reino": "Templo dos Ornitorrincos",
+      "chefe": "ornitorrinco_oraculo"
+    },
+    {
+      "reino": "Cascata da Fuligem",
+      "chefe": "grao_duque_da_sucata"
+    }
+  ],
+  "reino_inicial": "Pântano Maluco",
+  "moedas_iniciais": 6,
+  "tamanho_mao_inicial": 5,
+  "recrutamentos_gratuitos_iniciais": 3,
+  "baralho_do_reino": [
+    {
+      "id": "lobo_mal",
+      "copias": 1
+    },
+    {
+      "id": "porquinhos_viloes",
+      "copias": 1
+    },
+    {
+      "id": "ratos_mafiosos",
+      "copias": 1
+    },
+    {
+      "id": "xerife_do_mal",
+      "copias": 1
+    },
+    {
+      "id": "mercenario_do_deserto",
+      "copias": 1
+    },
+    {
+      "id": "guerreiro_beduino",
+      "copias": 1
+    },
+    {
+      "id": "areia_movedica",
+      "copias": 1
+    },
+    {
+      "id": "ponte_despencando",
+      "copias": 1
+    },
+    {
+      "id": "gato_de_botas",
+      "copias": 1
+    },
+    {
+      "id": "lute_por_honra",
+      "copias": 1
+    },
+    {
+      "id": "barao_do_pantano",
+      "copias": 1
+    },
+    {
+      "id": "mercador",
+      "copias": 2
+    }
+  ],
+  "baralho_pessoal_do_teste": [
+    {
+      "id": "cavaleiro_pizza",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_banana",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_dragao",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_pao_com_manteiga",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_tigre",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_rosquinha_de_chocolate",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_boxeador",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_bombado",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_aranha",
+      "copias": 2
+    },
+    {
+      "id": "cavaleiro_dando_grau",
+      "copias": 2
+    }
+  ],
+  "ordem_pessoal_de_teste_do_topo": [
+    "cavaleiro_pizza:1",
+    "cavaleiro_banana:1",
+    "cavaleiro_dragao:1",
+    "cavaleiro_pao_com_manteiga:1",
+    "cavaleiro_tigre:1",
+    "cavaleiro_rosquinha_de_chocolate:1",
+    "cavaleiro_boxeador:1",
+    "cavaleiro_bombado:1",
+    "cavaleiro_aranha:1",
+    "cavaleiro_dando_grau:1",
+    "cavaleiro_pizza:2",
+    "cavaleiro_banana:2",
+    "cavaleiro_dragao:2",
+    "cavaleiro_pao_com_manteiga:2",
+    "cavaleiro_tigre:2",
+    "cavaleiro_rosquinha_de_chocolate:2",
+    "cavaleiro_boxeador:2",
+    "cavaleiro_bombado:2",
+    "cavaleiro_aranha:2",
+    "cavaleiro_dando_grau:2"
+  ],
+  "mao_inicial_em_campo": [
+    "cavaleiro_pizza:1",
+    "cavaleiro_banana:1",
+    "cavaleiro_dragao:1"
+  ],
+  "mao_inicial_restante": [
+    "cavaleiro_pao_com_manteiga:1",
+    "cavaleiro_tigre:1"
+  ]
+}

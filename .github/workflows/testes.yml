@@ -1,0 +1,32 @@
+name: Cenários de regras
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cenarios:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar Godot 4.7
+        run: |
+          for v in 4.7.2 4.7.1 4.7; do
+            url="https://github.com/godotengine/godot/releases/download/${v}-stable/Godot_v${v}-stable_linux.x86_64.zip"
+            if curl -fsSL -o godot.zip "$url"; then echo "Usando Godot $v"; break; fi
+          done
+          unzip -q godot.zip
+          mv Godot_v*_linux.x86_64 godot
+          chmod +x godot
+          ./godot --version
+
+      - name: Importar projeto
+        run: ./godot --headless --path . --import 2>&1 | tail -20 || true
+
+      - name: Rodar os quatro cenários
+        run: |
+          set -o pipefail
+          ./godot --headless --path . -s res://testes/executar_cenarios.gd 2>&1 | tee saida.txt
+          grep -q "TODOS OS CENÁRIOS PASSARAM" saida.txt

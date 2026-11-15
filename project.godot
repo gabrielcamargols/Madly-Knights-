@@ -8,9 +8,10 @@ config/description="Jogo de cartas de aventura — Modo Contra"
 run/main_scene="res://cenas/principal.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
-[autoload]
+[display]
 
-Regras="*res://scripts/core/regras.gd"
+window/size/viewport_width=1600
+window/size/viewport_height=900
 
 [rendering]
 

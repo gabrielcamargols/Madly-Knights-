@@ -1,0 +1,253 @@
+{
+  "inimigos_do_playtest": [
+    {
+      "id": "lobo_mal",
+      "nome": "Lobo Mal",
+      "tipo": "monstro",
+      "forca": 5,
+      "armadura_maxima": 4,
+      "ameaca": 2,
+      "habilidade": "Disfarce da Vovó",
+      "efeito": "Na abertura, o primeiro Cavaleiro da fila sofre −1 Força até o fim do turno. Antes do primeiro ataque desse Cavaleiro contra o Lobo, o Lobo ganha +1 de Armadura atual e máxima. Esse ganho acontece uma vez.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_083a12da6fb481918f78d025289ee75e&account_id=personal",
+      "arte": "referencias/cartas/lobo_mal.png"
+    },
+    {
+      "id": "porquinhos_viloes",
+      "nome": "Porquinhos Vilões",
+      "tipo": "monstro",
+      "forca": 3,
+      "armadura_maxima": 4,
+      "ameaca": 3,
+      "habilidade": "Trapaça Suína",
+      "efeito": "Após novas rolagens, aplique −1 no D6 do Cavaleiro e +1 no D6 dos Porquinhos. Com 1 do Cavaleiro ou 6 dos Porquinhos, mantenha esse valor nesta etapa e cause 2 de dano a todos os Cavaleiros em campo. Se quem ia atacar for derrotado pelo efeito, cancele o golpe. Em seguida resolva outros modificadores.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_827d6b903200819193a881a4b0d12741&account_id=personal",
+      "arte": "referencias/cartas/porquinhos_viloes.png"
+    },
+    {
+      "id": "ratos_mafiosos",
+      "nome": "Ratos Mafiosos",
+      "tipo": "monstro",
+      "forca": 3,
+      "armadura_maxima": 4,
+      "ameaca": 3,
+      "habilidade": "Roubo de Moedas",
+      "efeito": "O dano dos ataques reduz as moedas do jogador até zero. O excedente termina ali. A recompensa de 3 moedas de Ameaça é paga normalmente.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_757460191e3c819192dddcadca6bf4e5&account_id=personal",
+      "arte": "referencias/cartas/ratos_mafiosos.png"
+    },
+    {
+      "id": "xerife_do_mal",
+      "nome": "Xerife do Mal",
+      "tipo": "monstro",
+      "forca": 6,
+      "armadura_maxima": 5,
+      "ameaca": 2,
+      "habilidade": "Mandado Sombrio",
+      "efeito": "Na abertura, o primeiro Cavaleiro da fila sofre −1 de Força até o fim do turno.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_ec8df5ec91208191a53d1a9d369ebda3&account_id=personal",
+      "arte": "referencias/cartas/xerife_do_mal.png"
+    },
+    {
+      "id": "mercenario_do_deserto",
+      "nome": "Mercenário do Deserto",
+      "tipo": "inimigo",
+      "forca": 4,
+      "armadura_maxima": 3,
+      "ameaca": 4,
+      "habilidade": "Líder Implacável",
+      "efeito": "Se estiver sozinho, tem +1 Força e +1 Armadura atual e máxima. Seus outros Capangas ganham +1 Força quando um encontro os põe em campo juntos.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_50532dbf018081918a2ea92119b3173a&account_id=personal",
+      "arte": "referencias/cartas/mercenario_do_deserto.png"
+    },
+    {
+      "id": "guerreiro_beduino",
+      "nome": "Guerreiro Beduíno",
+      "tipo": "inimigo",
+      "forca": 3,
+      "armadura_maxima": 2,
+      "ameaca": 2,
+      "habilidade": "Treinamento do Deserto",
+      "efeito": "Enquanto estiver em campo junto do Mercenário em um encontro, o Mercenário ganha +1 Força. Se revelado sozinho, luta sozinho.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_9fede263ffb08191b9ce0f4dfaa86ed3&account_id=personal",
+      "arte": "referencias/cartas/prancha_do_guerreiro_beduino.png"
+    }
+  ],
+  "chefes_de_reino": [
+    {
+      "id": "imperador_panqueca",
+      "nome": "Imperador Panqueca",
+      "tipo": "chefe",
+      "forca": 11,
+      "armadura_maxima": 27,
+      "ameaca": 38,
+      "habilidade": "Calda Imperial",
+      "efeito": "Antes de cada ataque de Cavaleiro, role D6. Com 1–3, aplique −1 no D6 de ataque do Cavaleiro, mínimo 1. Com 4–6, o Imperador sofre 3 de dano. Se a calda o derrotar, encerre o combate antes da rolagem do ataque e credite a vitória ao Cavaleiro ativo.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_7d3f1b969d9c81918323458e29d7e092&account_id=personal"
+    },
+    {
+      "id": "barao_do_pantano",
+      "nome": "Barão do Pântano",
+      "tipo": "chefe",
+      "forca": 13,
+      "armadura_maxima": 18,
+      "ameaca": 35,
+      "habilidade": "Salto Lodoso",
+      "efeito": "Após o ataque normal do Barão, o Cavaleiro atacado vai ao fim da fila se sobreviver. Todos os outros Cavaleiros em campo sofrem 1 de dano. O primeiro da fila resultante faz o próximo ataque.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_f6e6fa86daec8191b8139fbc31f3264e&account_id=personal",
+      "arte": "referencias/cartas/barao_do_pantano.png"
+    },
+    {
+      "id": "sir_apelao",
+      "nome": "Sir Apelão",
+      "tipo": "chefe",
+      "forca": 14,
+      "armadura_maxima": 19,
+      "ameaca": 38,
+      "habilidade": "Investida Real",
+      "efeito": "Ao entrar, move o primeiro Cavaleiro para o fim da fila. Se houver apenas um, causa 3 de dano nele. Resolva antes do primeiro ataque.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_f6573d1a23948191822343482a8b5f5d&account_id=personal"
+    },
+    {
+      "id": "cronarca_do_portal",
+      "nome": "Cronarca do Portal",
+      "tipo": "chefe",
+      "forca": 12,
+      "armadura_maxima": 17,
+      "ameaca": 40,
+      "habilidade": "Volta no Tempo",
+      "efeito": "Quando derrota um Cavaleiro, volta à Armadura máxima e perde seus efeitos temporários. Suas Espadas Douradas e os respectivos bônus continuam ativos. O próximo Cavaleiro assume o combate.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_94372424de988191bf4b3a528bbac16c&account_id=personal"
+    },
+    {
+      "id": "ornitorrinco_oraculo",
+      "nome": "Ornitorrinco Oráculo",
+      "tipo": "chefe",
+      "forca": 12,
+      "armadura_maxima": 17,
+      "ameaca": 39,
+      "habilidade": "Profecia do Bico",
+      "efeito": "Ao entrar, revele o topo do reino. Se for Monstro ou Inimigo, o primeiro Cavaleiro sofre 3 de dano. Se for outro tipo, o jogador compra 1 Cavaleiro do baralho pessoal. A carta revelada volta ao topo do reino.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_95a29ab86e5081918cb10e38f52508ae&account_id=personal"
+    },
+    {
+      "id": "grao_duque_da_sucata",
+      "nome": "Grão-Duque da Sucata",
+      "tipo": "chefe",
+      "forca": 11,
+      "armadura_maxima": 13,
+      "ameaca": 30,
+      "habilidade": "Coleção de Ferro",
+      "efeito": "Ao entrar, causa 1 de dano a cada Cavaleiro em campo. Para cada ponto de Armadura efetivamente perdido por esse efeito, ganha +1 Armadura atual e máxima até o fim do combate.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_407a3b7fcfe88191aa5fc5dbddc33591&account_id=personal"
+    }
+  ],
+  "defensores_da_cidade_central": [
+    {
+      "id": "vereador_marquinhos",
+      "nome": "Vereador Marquinhos",
+      "tipo": "miniboss",
+      "forca": 7,
+      "armadura_maxima": 17,
+      "ameaca": 18,
+      "habilidade": "Taxa Municipal",
+      "efeito": "Antes de cada ataque contra ele, o jogador pode pagar 1 moeda. Sem pagamento, aplique −1 no D6 desse ataque, mínimo 1.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_0559b2f63be88191821218e7904487e0&account_id=personal"
+    },
+    {
+      "id": "tesoureiro_robotico",
+      "nome": "Tesoureiro Robótico",
+      "tipo": "miniboss",
+      "forca": 8,
+      "armadura_maxima": 19,
+      "ameaca": 20,
+      "habilidade": "Juros Abusivos",
+      "efeito": "No início de cada rodada de combate, antes do ataque do Cavaleiro, o jogador pode pagar 1 moeda. Sem pagamento, o Tesoureiro ganha +1 Força acumulativo até o fim da tentativa. Em nova tentativa, mantém o dano sofrido e volta à Força base.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_902bf19cfb508191a7ab997377d2b6fc&account_id=personal"
+    },
+    {
+      "id": "cavaleiro_maligno_palhaco",
+      "nome": "Cavaleiro Maligno Palhaço",
+      "tipo": "miniboss",
+      "forca": 10,
+      "armadura_maxima": 21,
+      "ameaca": 22,
+      "habilidade": "Piada Mortal",
+      "efeito": "No início da rodada, antes do ataque do Cavaleiro, role D6. Com 1–2, o Cavaleiro ativo sofre 2 de dano. Com 3–4, nada. Com 5–6, o miniboss sofre 2 de dano. Se isso o derrotar, credite a vitória e a Ameaça ao jogador ativo.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_6c2199214acc81919f1748ab92eba7ae&account_id=personal"
+    },
+    {
+      "id": "prefeito_tita",
+      "nome": "Prefeito Titã",
+      "tipo": "chefe_final",
+      "forca": 11,
+      "armadura_maxima": 18,
+      "ameaca": 36,
+      "habilidade": "Ordem de Demolição",
+      "efeito": "Só na primeira revelação da partida, role D6 e elimine o Cavaleiro na posição indicada da esquerda para a direita. Posição vazia deixa a rolagem sem efeito. Em futuras tentativas, mantenha o dano acumulado e prossiga com o combate. Some +10 Força e +15 Armadura por Espada carregada.",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_bc6d7426cacc8191953383575e4165b4&account_id=personal"
+    }
+  ],
+  "eventos": [
+    {
+      "id": "ponte_despencando",
+      "nome": "Ponte Despencando!",
+      "participantes": "jogadores_do_reino",
+      "efeito": "Resolva em ordem de turno a partir de quem revelou. Cada participante pode descartar um Cavaleiro ou item da mão para atravessar. Se rolar D6, com 1–3 o primeiro Cavaleiro sofre 2 de dano e o jogador falha, com 4–6 atravessa. Atravessar supera o Evento. O primeiro a atravessar dá +2 Prestígio ao primeiro Cavaleiro da sua fila.",
+      "arte": "referencias/cartas/01_Ponte_Despencando.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_d6a3c6b0430c81919101caab320319f0&account_id=personal"
+    },
+    {
+      "id": "areia_movedica",
+      "nome": "Areia Movediça!",
+      "participantes": "jogadores_do_reino",
+      "efeito": "Cada participante escolhe um Cavaleiro em campo e rola D6. Depois de ver o resultado, pode descartar um Cavaleiro ou item da mão para somar +2, limitado a 6. Com 1–2, falha e o Cavaleiro volta à mão mantendo dano, Prestígio ganho e equipamento. Se a mão chegar a seis Cavaleiros, escolha um para o Cemitério. Com 3–4, sofre 2 de dano e supera se sobreviver. Com 5–6 supera ileso.",
+      "arte": "referencias/cartas/02_Areia_Movedica.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_5b56ebb4474481919611a700cd831613&account_id=personal"
+    },
+    {
+      "id": "o_chao_e_lava",
+      "nome": "O Chão é Lava!",
+      "participantes": "jogadores_do_reino",
+      "efeito": "Cada participante pode descartar um Cavaleiro ou item da mão para montar uma plataforma e superar o Evento. Quem não descartar escolhe um Cavaleiro em campo para sofrer 3 de dano. Se sobreviver, ele fica em campo. Se todos descartarem, cada participante compra 1 Cavaleiro do baralho pessoal.",
+      "arte": "referencias/cartas/03_O_Chao_e_Lava.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_625fffa61d8c8191bf5dd838a62abc38&account_id=personal"
+    },
+    {
+      "id": "lute_por_honra",
+      "nome": "Lute por Honra!",
+      "participantes": "jogador_ativo",
+      "efeito": "Revele o topo do baralho pessoal e enfrente a carta com o primeiro Cavaleiro da fila. A maior Honra abre o combate. Em empate, cada lado rola D6 e o maior começa, repetindo empate. Se o jogador vencer, seu Cavaleiro recebe +5 Prestígio e o jogador supera o Evento. A carta revelada vai ao Cemitério se derrotada e ao fundo do baralho se sobreviver.",
+      "arte": "referencias/cartas/04_Lute_por_Honra.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_e7c966490e348191b7f84d43ec1e5fae&account_id=personal"
+    },
+    {
+      "id": "furacao_tubarao",
+      "nome": "Furacão Tubarão!",
+      "participantes": "jogador_ativo",
+      "efeito": "Quem revelou rola D6. Com 1–2, todos os seus Cavaleiros em campo sofrem 3 de dano e ele falha. Com 3, termina sem efeito ou progresso. Com 4–6, supera e busca a Espada Tubarônica no baralho de itens, coloca na mão e embaralha. Se a Espada já saiu do baralho, o sucesso ainda concede as 2 moedas e o progresso.",
+      "arte": "referencias/cartas/05_Furacao_Tubarao.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_2febf076f20881918167e183769c49ed&account_id=personal"
+    },
+    {
+      "id": "gato_de_botas",
+      "nome": "Gato de Botas!",
+      "participantes": "jogadores_do_reino",
+      "efeito": "Cada participante escolhe um Cavaleiro em campo e rola D6. Some +1 se ele tiver Arma equipada, até o máximo de 6. Com 1–2, o Cavaleiro sofre 2 de dano e o jogador falha. Com 3–4, empate sem progresso. Com 5–6, supera e o escolhido recebe +3 Prestígio.",
+      "arte": "referencias/cartas/06_Gato_de_Botas.png",
+      "fonte": "https://chatgpt.com/library?file_id=libfile_56c742abed348191a343abe4e1b5493d&account_id=personal"
+    }
+  ],
+  "mercador": {
+    "id": "mercador",
+    "nome": "Mercador",
+    "itens_revelados": 5,
+    "altera_fila": false
+  },
+  "shogun_lendario": {
+    "nome": "Shogun Lendário",
+    "categoria": "Monstro Lendário",
+    "ameaca": null,
+    "fonte": "https://chatgpt.com/library?file_id=libfile_734ea50ccaf0819192d79ecd3a5e941a&account_id=personal"
+  }
+}

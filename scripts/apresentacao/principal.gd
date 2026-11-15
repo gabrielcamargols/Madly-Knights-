@@ -737,7 +737,7 @@ func _criar_interface() -> void:
 	mao_2d.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	mao_2d.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	mao_2d.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	mao_2d.offset_bottom = 14  # a mão encosta na borda, como nos jogos de cartas
+	mao_2d.offset_bottom = -8
 	mao_2d.alignment = BoxContainer.ALIGNMENT_CENTER
 	mao_2d.add_theme_constant_override("separation", -18)
 

@@ -35,6 +35,11 @@ func _initialize() -> void:
 			_apertar("Manter ordem atual")
 			await _esperar(0.5)
 	_salvar("5_preparacao")
+	# Põe um inimigo no topo do reino para a captura mostrar o ataque.
+	var baralho: Array = cena.partida.baralhos_reino[cena.jogador.reino_atual]
+	if baralho.has("mercenario_do_deserto"):
+		baralho.erase("mercenario_do_deserto")
+		baralho.push_front("mercenario_do_deserto")
 	_apertar("Explorar o reino")
 	for passo in 80:
 		await _esperar(0.4)

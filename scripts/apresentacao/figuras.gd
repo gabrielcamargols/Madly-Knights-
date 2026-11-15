@@ -1,16 +1,15 @@
 extends RefCounted
+
+const Visual = preload("res://scripts/apresentacao/visual.gd")
 ## Modelos 3D cartunescos TEMPORÁRIOS, montados com formas simples.
 ## Proposta visual (não é regra): proporções "chibi" com cabeça grande, base redonda
 ## e cores e elmo tirados da ilustração aprovada de cada Cavaleiro
 ## (dados/paletas_cavaleiros.json). Serão trocados por modelos definitivos.
 
 
-static func _material(cor: Color, metal: float = 0.0, aspereza: float = 0.7) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.albedo_color = cor
-	m.metallic = metal
-	m.roughness = aspereza
-	return m
+## Mesmo acabamento do cenário (toon com contorno), sem mudar o desenho das figuras.
+static func _material(cor: Color, metal: float = 0.0, _aspereza: float = 0.7) -> StandardMaterial3D:
+	return Visual.mat(cor, 0.014, false, metal)
 
 
 static func _peca(pai: Node3D, malha: Mesh, cor: Color, posicao: Vector3, rotacao: Vector3 = Vector3.ZERO, metal: float = 0.0) -> MeshInstance3D:

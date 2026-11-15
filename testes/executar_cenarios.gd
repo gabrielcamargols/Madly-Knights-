@@ -17,7 +17,7 @@ var verificacoes := 0
 
 func _initialize() -> void:
 	# Compila também os scripts que os cenários não usam, como a mesa 3D.
-	for caminho in ["res://scripts/apresentacao/principal.gd", "res://scripts/apresentacao/menu.gd"]:
+	for caminho in ["res://scripts/apresentacao/principal.gd", "res://scripts/apresentacao/menu.gd", "res://scripts/apresentacao/visual.gd", "res://scripts/apresentacao/tema.gd", "res://scripts/apresentacao/figuras.gd"]:
 		var script = load(caminho)
 		if script == null or not script.can_instantiate():
 			falhas.append("Script não compila: " + caminho)

@@ -1,6 +1,6 @@
 extends SceneTree
-## Abre o menu e a mesa, faz a preparação da partida (arrastando cartas para a mesa),
-## joga um turno atacando o inimigo, toca numa carta e salva capturas de tela.
+## Abre o menu e a mesa e joga um turno usando entrada real (toques e arraste),
+## conferindo o que a tela mostra. Salva capturas para revisão.
 ##   xvfb-run godot --path . --rendering-driver opengl3 --resolution 1280x720 -s res://testes/captura.gd
 
 var cena
@@ -19,72 +19,86 @@ func _initialize() -> void:
 	_salvar("1_reino_inicial")
 	_apertar("Pântano Maluco")
 	await _esperar(0.6)
-	_salvar("2_mulligan")
-	_apertar("Manter mão")
+	# Seleção: toca na primeira carta do mulligan (fica marcada) e troca.
+	var primeira: Control = cena.cartas_escolha.get_child(0)
+	await _tocar(primeira.get_global_rect().get_center())
+	await _esperar(0.3)
+	_salvar("2_mulligan_com_selecao")
+	print("Mulligan: %d carta(s) marcada(s) pelo toque" % cena.selecionados.size())
+	_apertar("Trocar 1 marcada")
 	await _esperar(0.4)
+	_apertar("Manter mão")
+	await _esperar(0.6)
+	# Mão inteira dentro da tela.
+	var tela: Rect2 = root.get_visible_rect()
+	var dentro := true
+	for carta in cena.mao_2d.get_children():
+		var r: Rect2 = carta.get_global_rect()
+		if r.position.y < 0 or r.end.y > tela.size.y + 1 or r.position.x < 0 or r.end.x > tela.size.x:
+			dentro = false
+	print("Mão inteira visível: %s (%d cartas, mão de y=%d a y=%d, tela %d)" % [dentro, cena.mao_2d.get_child_count(), int(cena.mao_2d.get_global_rect().position.y), int(cena.mao_2d.get_global_rect().end.y), int(tela.size.y)])
+	_salvar("3_mao_e_vagas")
+	# Arraste real: três cartas da mão até a vaga iluminada.
 	for n in 3:
-		var livres: Array = cena.jogador.mao.filter(func(c): return not cena.pendentes.has(c))
-		cena.jogar_em_campo(livres[0])
-		if n == 0:
-			await _esperar(0.6)
-			_salvar("3_colocando_iniciais")
-	await _esperar(0.8)
+		var carta: Control = cena.mao_2d.get_child(0)
+		var de := carta.get_global_rect().get_center()
+		var para: Vector2 = cena.camera.unproject_position(cena._pos_vaga(cena.pendentes.size()))
+		await _arrastar(de, para, n == 0)
+		await _esperar(0.5)
+	print("Arraste: %d Cavaleiro(s) em campo após 3 arrastes" % cena.jogador.fila.size())
 	for tentativa in 4:
 		if cena.camada_escolha.visible:
-			_salvar("4_empate_de_honra")
+			_salvar("5_empate_de_honra")
 			_apertar("Manter ordem atual")
 			await _esperar(0.5)
-	_salvar("5_preparacao")
-	# Põe um inimigo no topo do reino para a captura mostrar o ataque.
+	print("Ordem de ataque (fila): %s" % ", ".join(cena.jogador.fila.map(func(c): return "%s(H%d)" % [c.nome, c.honra()])))
+	_salvar("6_preparacao")
+	# Põe um inimigo no topo para a captura mostrar o combate.
 	var baralho: Array = cena.partida.baralhos_reino[cena.jogador.reino_atual]
 	if baralho.has("mercenario_do_deserto"):
 		baralho.erase("mercenario_do_deserto")
 		baralho.push_front("mercenario_do_deserto")
 	_apertar("Explorar o reino")
-	for passo in 80:
-		await _esperar(0.4)
+	for passo in 90:
+		await _esperar(0.35)
 		if _botao_existe("Próximo turno") or cena.partida.playtest_encerrado:
 			break
 		if cena.vitrine.visible:
-			_salvar_uma_vez("8d_revelacao")
-		if cena.faixa.visible:
-			_salvar_uma_vez("8e_faixa_" + cena.faixa.text.left(8).to_lower().replace(" ", ""))
-		elif cena.legenda.visible:
-			_salvar_uma_vez("8f_legenda")
+			_salvar_uma_vez("7_revelacao")
 		if cena.camada_dado.visible and cena.dado_aguardando:
-			_salvar_uma_vez("8a_jogue_o_dado")
+			_salvar_uma_vez("9_jogue_o_dado")
 			cena._lancar_dado()
-			await _esperar(0.3)
-			_salvar_uma_vez("8b_dado_girando")
-			await _esperar(0.7)
-			_salvar_uma_vez("8c_resultado_do_dado")
 		elif cena.camada_dado.visible:
-			pass
+			_salvar_uma_vez("10_dado_rolando")
 		elif cena.modo == "ataque":
-			_salvar_uma_vez("6_vez_de_atacar")
-			cena.atacar()
-			await _esperar(0.25)
-			_salvar_uma_vez("7_dado_e_dano")
+			_salvar_uma_vez("8_vez_de_atacar")
+			# Toque real no inimigo.
+			await _tocar(cena.camera.unproject_position(cena.POS_ENCONTRO + Vector3(0, 0.6, 0)))
+		elif cena.faixa.visible:
+			_salvar_uma_vez("11_faixa")
+		elif cena.legenda.visible:
+			_salvar_uma_vez("12_legenda")
 		elif cena.camada_escolha.visible:
-			_salvar_uma_vez("8_escolha_" + str(passo))
+			_salvar_uma_vez("13_escolha")
 			_resolver_escolha()
 		elif cena.modo == "reerguer":
 			var livres: Array = cena.jogador.mao.filter(func(c): return not cena.pendentes.has(c))
 			if not livres.is_empty():
 				cena.jogar_em_campo(livres[0])
 	await _esperar(0.6)
-	_salvar("9_fim_do_turno")
-	if not cena.jogador.fila.is_empty() and not cena.camada_escolha.visible:
-		var no: Node3D = cena.cartas_3d[cena._chave(cena.jogador.fila[0])]
-		_clicar(cena.camera.unproject_position(no.position))
+	_salvar("14_fim_do_turno")
+	var j = cena.jogador
+	print("Contadores: moedas=%d (%s), inimigos=%d (%s), eventos=%d (%s)" % [j.moedas, cena.chips["moedas"].text, j.inimigos, cena.chips["inimigos"].text, j.eventos, cena.chips["eventos"].text])
+	if not j.fila.is_empty():
+		var no: Node3D = cena.cartas_3d[cena._chave(j.fila[0])]
+		await _tocar(cena.camera.unproject_position(no.position + Vector3(0, 0.5, 0)))
 		await _esperar(0.4)
-		_salvar("10_detalhes_da_carta")
-		print("Detalhes visíveis: %s" % cena.camada_detalhes.visible)
+		_salvar("15_detalhes_da_carta")
+		print("Detalhes abertos pelo toque na figura: %s" % cena.camada_detalhes.visible)
 	print("Dica final: " + cena.rotulo_dica.text)
 	quit()
 
 
-## Escolhe a opção mais segura: o último botão; sem botões, a primeira carta.
 func _resolver_escolha() -> void:
 	var botoes: Array = cena.botoes_escolha.get_children().filter(func(b): return b is Button and not b.disabled)
 	if not botoes.is_empty():
@@ -92,10 +106,7 @@ func _resolver_escolha() -> void:
 		return
 	for carta in cena.cartas_escolha.get_children():
 		if carta.modulate.r > 0.9:
-			var ev := InputEventMouseButton.new()
-			ev.button_index = MOUSE_BUTTON_LEFT
-			ev.pressed = false
-			carta.gui_input.emit(ev)
+			await _tocar(carta.get_global_rect().get_center())
 			return
 
 
@@ -106,14 +117,42 @@ func _botao_existe(texto: String) -> bool:
 	return false
 
 
-func _clicar(ponto: Vector2) -> void:
-	for apertado in [true, false]:
-		var ev := InputEventMouseButton.new()
-		ev.button_index = MOUSE_BUTTON_LEFT
-		ev.pressed = apertado
-		ev.position = ponto
-		ev.global_position = ponto
+func _mouse(posicao: Vector2, apertado: bool) -> void:
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.pressed = apertado
+	ev.button_mask = MOUSE_BUTTON_MASK_LEFT if apertado else 0
+	ev.position = posicao
+	ev.global_position = posicao
+	root.push_input(ev)
+
+
+func _tocar(posicao: Vector2) -> void:
+	_mouse(posicao, true)
+	await process_frame
+	_mouse(posicao, false)
+	await process_frame
+
+
+## Arraste de verdade: aperta, move em passos e solta.
+func _arrastar(de: Vector2, para: Vector2, capturar: bool) -> void:
+	_mouse(de, true)
+	await process_frame
+	var anterior := de
+	for k in range(1, 16):
+		var p := de.lerp(para, k / 15.0)
+		var ev := InputEventMouseMotion.new()
+		ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+		ev.position = p
+		ev.global_position = p
+		ev.relative = p - anterior
 		root.push_input(ev)
+		anterior = p
+		await process_frame
+		if capturar and k == 12:
+			_salvar("4_arrastando_para_a_vaga")
+	_mouse(para, false)
+	await process_frame
 
 
 func _apertar(texto: String) -> void:

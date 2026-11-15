@@ -4,6 +4,8 @@ extends RefCounted
 
 signal registrou(texto: String)
 signal revelou(carta_id: String)
+signal passo_de_combate
+signal continuar
 
 const Regras = preload("res://scripts/core/regras.gd")
 const Cavaleiro = preload("res://scripts/core/cavaleiro.gd")
@@ -27,6 +29,10 @@ var playtest_encerrado := false
 var historico: Array = []
 var relatorio: Dictionary = {}  # dados do turno atual, para a apresentação e os testes
 var turno := 0
+var inimigo_atual = null  # inimigo do encontro em curso (ou o último), para a apresentação
+## Com pausas ligadas, a lógica emite `passo_de_combate` entre os golpes e espera
+## a apresentação emitir `continuar`. Os testes deixam desligado.
+var com_pausas := false
 
 
 func _init(p_catalogo, p_dado, p_embaralhador) -> void:
@@ -460,6 +466,7 @@ func _explorar(j) -> String:
 		registrar("O baralho de %s está vazio." % r)
 		return ""
 	var carta: String = baralhos_reino[r].pop_front()
+	inimigo_atual = null
 	revelou.emit(carta)
 	registrar("%s revela %s." % [j.id, cat.nome_de_carta(carta)])
 	return carta
@@ -528,11 +535,13 @@ func _combate(j, carta_id: String) -> String:
 			ini.receber_espadas(n)
 			registrar("%s carrega %d Espada(s) Dourada(s)." % [ini.nome, n])
 	relatorio["inimigo"] = ini.id
+	inimigo_atual = ini
 	for c in j.fila:
 		c.iniciar_combate()
 	_abertura(j, ini)
 	relatorio["armadura_inimigo"] = [ini.armadura_atual]
 	registrar("Combate contra %s (F%d A%d)." % [ini.nome, ini.forca_total(), ini.armadura_atual])
+	await _pausa()
 	var ultimo = null
 	while ini.vivo():
 		if j.fila.is_empty():
@@ -540,13 +549,21 @@ func _combate(j, carta_id: String) -> String:
 		var atacante = j.fila[0]
 		ultimo = atacante
 		_ataque_do_cavaleiro(j, atacante, ini)
+		await _pausa()
 		if not ini.vivo():
 			break
 		if not atacante.vivo():
 			continue
 		_contra_ataque(j, atacante, ini)
+		await _pausa()
 	_vitoria(j, ultimo, ini)
 	return "ok"
+
+
+func _pausa() -> void:
+	if com_pausas:
+		passo_de_combate.emit()
+		await continuar
 
 
 func _abertura(j, ini) -> void:

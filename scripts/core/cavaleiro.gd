@@ -6,6 +6,7 @@ var id_carta: String
 var nome: String
 var cor: String
 var habilidade: String
+var habilidade_texto: String
 var forca_impressa: int
 var armadura_impressa: int
 var honra_impressa: int
@@ -29,8 +30,10 @@ func _init(p_id_instancia: String, dados: Dictionary) -> void:
 	nome = dados["nome"]
 	cor = str(dados.get("cor", ""))
 	habilidade = ""
+	habilidade_texto = ""
 	if dados.get("habilidade") is Dictionary:
 		habilidade = dados["habilidade"]["nome"]
+		habilidade_texto = str(dados["habilidade"].get("descricao", ""))
 	forca_impressa = _num(dados.get("forca"))
 	armadura_impressa = _num(dados.get("armadura"))
 	honra_impressa = _num(dados.get("honra"))

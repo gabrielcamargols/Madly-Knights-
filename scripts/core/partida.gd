@@ -112,6 +112,15 @@ func adicionar_jogador(id: String, ordem_instancias: Array = [], decisor = null)
 	return j
 
 
+## Cada jogador escolhe o reino inicial antes de comprar a mão.
+func definir_reino_inicial(j, reino: String) -> void:
+	if not cat.circuito.has(reino):
+		return
+	j.reino_inicial = reino
+	j.reino_atual = reino
+	registrar("%s começa em %s." % [j.id, reino])
+
+
 func buscar_jogador(id: String) -> Variant:
 	for j in jogadores:
 		if j.id == id:
@@ -128,7 +137,8 @@ func preparar_inicio(j, com_mulligan: bool = true) -> void:
 			if devolver.is_empty():
 				break
 			fazer_mulligan(j, devolver)
-	colocar_iniciais(j, decisores[j.id].escolher_iniciais(self, j))
+	var iniciais: Array = await decisores[j.id].escolher_iniciais(self, j)
+	await colocar_iniciais(j, iniciais)
 
 
 func comprar_mao_inicial(j) -> void:
@@ -154,7 +164,7 @@ func colocar_iniciais(j, iniciais: Array) -> void:
 		if j.mao.has(c):
 			j.mao.erase(c)
 			j.fila.append(c)
-	ordenar_fila(j)
+	await ordenar_fila(j)
 	registrar("%s começa com %s." % [j.id, ", ".join(j.fila.map(func(c): return c.nome))])
 
 
@@ -263,7 +273,7 @@ func ordenar_fila(j) -> void:
 			k += 1
 		if k > i:
 			var grupo := ordenada.slice(i, k + 1)
-			var escolhida: Array = decisores[j.id].ordem_de_empate(self, j, grupo)
+			var escolhida: Array = await decisores[j.id].ordem_de_empate(self, j, grupo)
 			if escolhida.size() == grupo.size() and grupo.all(func(c): return escolhida.has(c)):
 				for n in grupo.size():
 					ordenada[i + n] = escolhida[n]
@@ -311,7 +321,7 @@ func jogar_turno(j) -> Dictionary:
 	var encerrado: bool = await iniciar_turno(j)
 	if encerrado:
 		return relatorio
-	_preparacao(j)
+	await _preparacao(j)
 	return await explorar_e_resolver(j)
 
 
@@ -358,7 +368,7 @@ func _fim_do_turno(j) -> void:
 
 func _preparacao(j) -> void:
 	for acao in decisores[j.id].acoes_preparacao(self, j):
-		executar_acao_preparacao(j, acao)
+		await executar_acao_preparacao(j, acao)
 
 
 func executar_acao_preparacao(j, acao: Dictionary) -> bool:
@@ -366,7 +376,7 @@ func executar_acao_preparacao(j, acao: Dictionary) -> bool:
 		"comprar_cavaleiro":
 			return comprar_cavaleiro(j)
 		"recrutar":
-			return recrutar_da_mao(j, acao["cavaleiro"])
+			return await recrutar_da_mao(j, acao["cavaleiro"])
 		"equipar":
 			return equipar_item(j, acao["portador"], acao["item"])
 		"compra_as_cegas":
@@ -395,7 +405,7 @@ func recrutar_da_mao(j, id_instancia: String) -> bool:
 	j.moedas -= c.custo()
 	j.mao.erase(c)
 	_entrar_em_campo(j, c)
-	ordenar_fila(j)
+	await ordenar_fila(j)
 	return true
 
 
@@ -466,7 +476,7 @@ func _resolver(j, carta_id: String) -> String:
 			await _evento(j, carta_id)
 			descartes_reino[j.reino_atual].append(carta_id)
 		"monstro", "inimigo", "chefe":
-			return _combate(j, carta_id)
+			return await _combate(j, carta_id)
 		_:
 			registrar("Carta desconhecida: %s" % carta_id)
 	return "ok"
@@ -526,7 +536,7 @@ func _combate(j, carta_id: String) -> String:
 	var ultimo = null
 	while ini.vivo():
 		if j.fila.is_empty():
-			return _derrota_total(j, ini)
+			return await _derrota_total(j, ini)
 		var atacante = j.fila[0]
 		ultimo = atacante
 		_ataque_do_cavaleiro(j, atacante, ini)
@@ -768,7 +778,8 @@ func _derrota_total(j, ini) -> String:
 	j.reino_atual = j.reino_inicial
 	if j.mao.size() < 3:
 		_comprar(j, Regras.TAMANHO_MAO_INICIAL - j.mao.size())
-	colocar_iniciais(j, decisores[j.id].escolher_iniciais(self, j))
+	var iniciais: Array = await decisores[j.id].escolher_iniciais(self, j)
+	await colocar_iniciais(j, iniciais)
 	return "derrota_total"
 
 
@@ -1001,7 +1012,7 @@ func _repor(j) -> void:
 				_entrar_em_campo(j, gratis)
 			j.baralho = embaralhador.embaralhar(j.baralho, "reposicao_busca", _id_de_cavaleiro)
 	j.vagas = 0
-	ordenar_fila(j)
+	await ordenar_fila(j)
 
 
 func _menor_prestigio(lista: Array) -> Variant:
@@ -1074,7 +1085,7 @@ func _verificar_avanco(j) -> bool:
 		c.forca_temporaria = 0
 		c.flags_reino.clear()
 		c.curar_total()
-	ordenar_fila(j)
+	await ordenar_fila(j)
 	relatorio["avanco_por"] = por
 	relatorio["reino_concluido"] = origem
 	relatorio["reino"] = destino

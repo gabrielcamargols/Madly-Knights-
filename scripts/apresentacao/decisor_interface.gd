@@ -6,14 +6,36 @@ signal pedido(tipo: String, dados: Dictionary)
 signal respondido(valor)
 
 
+var _tem_resposta := false
+var _resposta = null
+
+
 func responder(valor) -> void:
+	_tem_resposta = true
+	_resposta = valor
 	respondido.emit(valor)
 
 
 func _perguntar(tipo: String, dados: Dictionary) -> Variant:
+	_tem_resposta = false
 	pedido.emit(tipo, dados)
-	var valor = await respondido
-	return valor
+	# A interface pode responder na hora, antes de começarmos a esperar.
+	if not _tem_resposta:
+		await respondido
+	_tem_resposta = false
+	return _resposta
+
+
+func escolher_iniciais(_partida, jogador) -> Array:
+	var r = await _perguntar("iniciais", {"jogador": jogador})
+	return r if r is Array else []
+
+
+func ordem_de_empate(_partida, jogador, grupo: Array) -> Array:
+	var r = await _perguntar("empate", {"jogador": jogador, "grupo": grupo})
+	if r is Array and r.size() == grupo.size():
+		return r
+	return grupo
 
 
 func itens_para_comprar(_partida, jogador, oferta: Array) -> Array:

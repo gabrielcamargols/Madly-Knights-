@@ -8,6 +8,7 @@ const Partida = preload("res://scripts/core/partida.gd")
 const Dado = preload("res://scripts/core/dado.gd")
 const Embaralhador = preload("res://scripts/core/embaralhador.gd")
 const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.gd")
+const Sessao = preload("res://scripts/apresentacao/sessao.gd")
 
 const ESPACO_CARTA := 1.15
 const POS_FILA_Z := 0.5
@@ -19,9 +20,10 @@ const POS_BARALHO := Vector3(-4.5, 0.0, 2.3)
 
 var cat
 var partida
-var jogador
-var decisor
-var cartas_3d: Dictionary = {}  # id_instancia -> Node3D
+var jogador  # jogador mostrado na mesa
+var indice_preparo := 0
+var indice_turno := 0
+var cartas_3d: Dictionary = {}  # "jogador/id_instancia" -> Node3D
 var carta_encontro: Node3D
 var pilha_reino: Node3D
 var rotulo_cemiterio: Label3D
@@ -64,13 +66,23 @@ func nova_partida() -> void:
 	partida = Partida.new(cat, Dado.new(), Embaralhador.new())
 	partida.registrou.connect(_ao_registrar)
 	partida.revelou.connect(_ao_revelar)
-	decisor = DecisorInterface.new()
-	decisor.pedido.connect(_ao_pedido)
 	partida.montar_mesa()
-	jogador = partida.adicionar_jogador("j1", [], decisor)
-	partida.comprar_mao_inicial(jogador)
-	_atualizar(false)
-	_tela_mulligan()
+	for k in clampi(Sessao.jogadores, 1, 4):
+		var decisor = DecisorInterface.new()
+		decisor.pedido.connect(_ao_pedido.bind(decisor))
+		partida.adicionar_jogador("j%d" % (k + 1), [], decisor)
+	indice_preparo = 0
+	indice_turno = 0
+	_preparar_proximo_jogador()
+
+
+func _nome(j) -> String:
+	return "Jogador %s" % j.id.substr(1)
+
+
+func _vez(j) -> String:
+	# Prefixo das perguntas quando há mais de um jogador.
+	return "" if partida.jogadores.size() == 1 else "%s: " % _nome(j)
 
 
 # --- Cena 3D --------------------------------------------------------------------
@@ -163,15 +175,19 @@ func _atualizar(animar: bool) -> void:
 		destinos[jogador.mao[i]] = Vector3((i - (m - 1) / 2.0) * ESPACO_CARTA, 0.0, POS_MAO_Z)
 	for i in jogador.cemiterio.size():
 		destinos[jogador.cemiterio[i]] = POS_CEMITERIO + Vector3(0, 0.07 * i, 0)
-	for id in cartas_3d.keys():
-		if not destinos.keys().any(func(c): return c.id_instancia == id):
-			cartas_3d[id].visible = false
+	var visiveis := {}
 	for c in destinos:
-		if not cartas_3d.has(c.id_instancia):
+		visiveis["%s/%s" % [jogador.id, c.id_instancia]] = c
+	for chave in cartas_3d.keys():
+		if not visiveis.has(chave):
+			cartas_3d[chave].visible = false
+	for chave in visiveis:
+		var c = visiveis[chave]
+		if not cartas_3d.has(chave):
 			var nova := _criar_carta("", _cor_do_cavaleiro(c))
 			nova.position = POS_BARALHO
-			cartas_3d[c.id_instancia] = nova
-		var carta: Node3D = cartas_3d[c.id_instancia]
+			cartas_3d[chave] = nova
+		var carta: Node3D = cartas_3d[chave]
 		carta.visible = true
 		_rotular(carta, _texto_do_cavaleiro(c))
 		if animar:
@@ -183,8 +199,8 @@ func _atualizar(animar: bool) -> void:
 	var itens := "nenhum"
 	if not jogador.itens_mao.is_empty():
 		itens = ", ".join(jogador.itens_mao.map(func(i): return i["nome"]))
-	rotulo_status.text = "%s   •   Moedas: %d\nInimigos: %d/4   Eventos: %d/3   Itens na mão: %s" % [
-		jogador.reino_atual, jogador.moedas, jogador.inimigos, jogador.eventos, itens]
+	rotulo_status.text = "%s%s   •   Moedas: %d\nInimigos: %d/4   Eventos: %d/3   Itens na mão: %s" % [
+		_vez(jogador), jogador.reino_atual, jogador.moedas, jogador.inimigos, jogador.eventos, itens]
 
 
 func _ao_revelar(carta_id: String) -> void:
@@ -212,10 +228,18 @@ func _criar_interface() -> void:
 	var topo := PanelContainer.new()
 	raiz.add_child(topo)
 	topo.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	var linha_topo := HBoxContainer.new()
+	topo.add_child(linha_topo)
+	var menu := Button.new()
+	menu.text = "Menu"
+	menu.custom_minimum_size = Vector2(90, 50)
+	menu.pressed.connect(func(): get_tree().change_scene_to_file("res://cenas/menu.tscn"))
+	linha_topo.add_child(menu)
 	rotulo_status = Label.new()
 	rotulo_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rotulo_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	topo.add_child(rotulo_status)
+	rotulo_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	linha_topo.add_child(rotulo_status)
 
 	var base := PanelContainer.new()
 	raiz.add_child(base)
@@ -290,10 +314,31 @@ func _rotulo_cavaleiro(c) -> String:
 	return "%s  F%d A%d/%d H%d P%d" % [_nome_curto(c), c.forca_total(), c.armadura_atual, c.armadura_maxima(), c.honra(), c.prestigio()]
 
 
-# --- Início -----------------------------------------------------------------------
+# --- Preparação da partida (manual §4) -----------------------------------------
+# Reino inicial, 6 moedas, 5 Cavaleiros, mulligan, 3 em campo de graça e fila por
+# Honra (o dono decide empates). Com vários jogadores, o maior D6 começa.
+
+func _preparar_proximo_jogador() -> void:
+	if indice_preparo >= partida.jogadores.size():
+		_tela_iniciativa()
+		return
+	jogador = partida.jogadores[indice_preparo]
+	_atualizar(false)
+	_perguntar("%sescolha o reino inicial. Você começa com %d moedas." % [_vez(jogador), jogador.moedas])
+	for r in cat.circuito:
+		var tem_cartas: bool = not partida.baralhos_reino[r].is_empty()
+		_botao(r if tem_cartas else "%s (em breve)" % r, _escolher_reino_inicial.bind(r), tem_cartas)
+
+
+func _escolher_reino_inicial(reino: String) -> void:
+	partida.definir_reino_inicial(jogador, reino)
+	partida.comprar_mao_inicial(jogador)
+	_atualizar(true)
+	_tela_mulligan()
+
 
 func _tela_mulligan() -> void:
-	_perguntar("Sua mão inicial. Marque as cartas que quer trocar (mulligan) ou mantenha a mão.")
+	_perguntar("%sesta é sua mão de 5 Cavaleiros. Marque as cartas que quer devolver ao baralho para comprar outras (mulligan), quantas vezes quiser, ou mantenha a mão." % _vez(jogador))
 	selecionados = []
 	for c in jogador.mao:
 		_alternavel(_rotulo_cavaleiro(c), c)
@@ -310,7 +355,7 @@ func _trocar_marcadas() -> void:
 
 
 func _tela_iniciais() -> void:
-	_perguntar("Escolha 3 Cavaleiros para entrar em campo de graça. A fila se ordena pela Honra.")
+	_perguntar("%sescolha 3 Cavaleiros para entrar em campo de graça. Os outros ficam na mão." % _vez(jogador))
 	selecionados = []
 	for c in jogador.mao:
 		_alternavel(_rotulo_cavaleiro(c), c)
@@ -321,14 +366,35 @@ func _confirmar_iniciais() -> void:
 	if selecionados.size() != mini(3, jogador.mao.size()):
 		rotulo_pergunta.text = "Marque exatamente 3 Cavaleiros."
 		return
-	partida.colocar_iniciais(jogador, selecionados)
+	var escolhidos := selecionados.duplicate()
+	_perguntar("")
+	await partida.colocar_iniciais(jogador, escolhidos)
 	_atualizar(true)
-	_comecar_turno()
+	indice_preparo += 1
+	_preparar_proximo_jogador()
+
+
+func _tela_iniciativa() -> void:
+	if partida.jogadores.size() == 1:
+		_comecar_turno()
+		return
+	_perguntar("Todos rolam o D6. O maior resultado começa; empates rolam de novo.")
+	_botao("Rolar o D6", _rolar_iniciativa)
+
+
+func _rolar_iniciativa() -> void:
+	partida.definir_ordem_de_turno()
+	var rolagens: Array = partida.dado.registro.slice(-partida.jogadores.size() * 4)
+	var texto := ", ".join(rolagens.filter(func(r): return r["motivo"].begins_with("iniciativa_")).map(
+		func(r): return "Jogador %s tirou %d" % [r["motivo"].substr(12), r["face"]]))
+	_perguntar("%s.\n%s começa!" % [texto, _nome(partida.jogadores[0])])
+	_botao("Começar", _comecar_turno)
 
 
 # --- Turno ------------------------------------------------------------------------
 
 func _comecar_turno() -> void:
+	jogador = partida.jogadores[indice_turno]
 	_perguntar("")
 	var avancou: bool = await partida.iniciar_turno(jogador)
 	_atualizar(true)
@@ -340,7 +406,7 @@ func _comecar_turno() -> void:
 
 func _tela_preparacao() -> void:
 	_atualizar(true)
-	_perguntar("Preparação: compre, recrute ou equipe. Depois explore o reino.")
+	_perguntar("%sPreparação: compre, recrute ou equipe. Depois explore o reino." % _vez(jogador))
 	_botao("Explorar o reino", _explorar)
 	_botao("Comprar Cavaleiro (1)", _comprar_cavaleiro, not jogador.comprou_cavaleiro_no_turno and jogador.moedas >= 1)
 	var tem_itens: bool = not partida.baralho_itens.is_empty() or not partida.descarte_itens.is_empty()
@@ -362,7 +428,8 @@ func _comprar_as_cegas() -> void:
 
 
 func _recrutar(c) -> void:
-	partida.recrutar_da_mao(jogador, c.id_instancia)
+	_perguntar("")
+	await partida.recrutar_da_mao(jogador, c.id_instancia)
 	_tela_preparacao()
 
 
@@ -387,15 +454,25 @@ func _explorar() -> void:
 		_tela_final()
 		return
 	var saldo: int = jogador.moedas - moedas_antes
-	_perguntar("Fim do turno. Moedas: %d (%s%d). Veja os detalhes no registro abaixo." % [jogador.moedas, "+" if saldo >= 0 else "", saldo])
-	_botao("Próximo turno", _comecar_turno)
+	_perguntar("%sfim do turno. Moedas: %d (%s%d). Veja os detalhes no registro abaixo." % [_vez(jogador), jogador.moedas, "+" if saldo >= 0 else "", saldo])
+	if partida.jogadores.size() == 1:
+		_botao("Próximo turno", _proximo_turno)
+	else:
+		var proximo = partida.jogadores[(indice_turno + 1) % partida.jogadores.size()]
+		_botao("Passar para %s" % _nome(proximo), _proximo_turno)
+
+
+func _proximo_turno() -> void:
+	indice_turno = (indice_turno + 1) % partida.jogadores.size()
+	_comecar_turno()
 
 
 func _tela_final() -> void:
 	var r: Dictionary = partida.relatorio
-	_perguntar("Playtest concluído! Você concluiu %s (%s) e chegou a %s com %d moedas." % [
-		r.get("reino_concluido", "o Pântano"), _texto_avanco(r.get("avanco_por", "")), jogador.reino_atual, jogador.moedas])
+	_perguntar("Playtest concluído! %sconcluiu %s (%s) e chegou a %s com %d moedas." % [
+		_vez(jogador), r.get("reino_concluido", "o Pântano"), _texto_avanco(r.get("avanco_por", "")), jogador.reino_atual, jogador.moedas])
 	_botao("Jogar de novo", nova_partida)
+	_botao("Menu", func(): get_tree().change_scene_to_file("res://cenas/menu.tscn"))
 
 
 func _texto_avanco(por: String) -> String:
@@ -411,74 +488,111 @@ func _texto_avanco(por: String) -> String:
 
 # --- Perguntas durante a resolução ---------------------------------------------
 
-func _ao_pedido(tipo: String, dados: Dictionary) -> void:
+func _ao_pedido(tipo: String, dados: Dictionary, decisor) -> void:
+	var quem = dados["jogador"]
 	_atualizar(true)
+	var vez := _vez(quem)
 	match tipo:
 		"mercador":
-			_tela_mercador(dados["oferta"])
+			_tela_mercador(decisor, quem, dados["oferta"])
 		"reposicao":
-			_tela_reposicao(dados["reveladas"], dados["pagaveis"])
+			_tela_reposicao(decisor, quem, dados["reveladas"], dados["pagaveis"])
 		"cavaleiro_evento":
-			_tela_cavaleiro_evento(dados["evento"])
+			_tela_cavaleiro_evento(decisor, quem, dados["evento"])
 		"descarte":
-			_tela_descarte(dados)
+			_tela_descarte(decisor, quem, dados)
+		"empate":
+			_tela_empate(decisor, quem, dados["grupo"], [])
+		"iniciais":
+			_tela_reerguer(decisor, quem)
 		"conversao":
-			_perguntar("Reino concluído! Converta o Prestígio dos Cavaleiros em campo.")
+			_perguntar("%sreino concluído! Converta o Prestígio dos Cavaleiros em campo." % vez)
 			_botao("Moedas (+%d)" % dados["total"], decisor.responder.bind("moedas"))
 			_botao("Status permanente", decisor.responder.bind("status"))
 		"status":
 			var c = dados["cavaleiro"]
 			var p: int = c.prestigio()
-			_perguntar("%s tem %d de Prestígio. Onde aplicar os pontos?" % [c.nome, p])
+			_perguntar("%s%s tem %d de Prestígio. Onde aplicar os pontos?" % [vez, c.nome, p])
 			_botao("+%d Força" % p, decisor.responder.bind({"forca": p, "armadura": 0, "honra": 0}))
 			_botao("+%d Armadura máxima" % p, decisor.responder.bind({"forca": 0, "armadura": p, "honra": 0}))
 			_botao("+%d Honra" % p, decisor.responder.bind({"forca": 0, "armadura": 0, "honra": p}))
 		"reino":
-			_perguntar("Chefe derrotado! Escolha o próximo reino.")
+			_perguntar("%schefe derrotado! Escolha o próximo reino." % vez)
 			for r in dados["permitidos"]:
 				_botao(r, decisor.responder.bind(r))
 		_:
 			decisor.responder(null)
 
 
-func _tela_mercador(oferta: Array) -> void:
+## Empate de Honra: o dono toca os Cavaleiros na ordem em que quer que fiquem.
+func _tela_empate(decisor, quem, grupo: Array, escolhidos: Array) -> void:
+	if escolhidos.size() == grupo.size():
+		decisor.responder(escolhidos)
+		return
+	var nomes := ", ".join(grupo.map(func(c): return _nome_curto(c)))
+	var ja := ""
+	if not escolhidos.is_empty():
+		ja = "\nOrdem até agora: %s." % ", ".join(escolhidos.map(func(c): return _nome_curto(c)))
+	_perguntar("%sempate de Honra (%d) entre %s. Toque quem vem primeiro na fila.%s" % [_vez(quem), grupo[0].honra(), nomes, ja])
+	for c in grupo:
+		if not escolhidos.has(c):
+			_botao(_nome_curto(c), _tela_empate.bind(decisor, quem, grupo, escolhidos + [c]))
+	if escolhidos.is_empty():
+		_botao("Manter ordem atual", decisor.responder.bind(grupo))
+
+
+## Depois de uma derrota total, escolha 3 Cavaleiros da mão para recomeçar.
+func _tela_reerguer(decisor, quem) -> void:
+	_perguntar("%sderrota total! Escolha 3 Cavaleiros da mão para recomeçar no reino inicial." % _vez(quem))
 	selecionados = []
-	_perguntar("Mercador! Marque os itens que quer comprar. Você tem %d moedas." % jogador.moedas)
+	for c in quem.mao:
+		_alternavel(_rotulo_cavaleiro(c), c)
+	_botao("Confirmar", _confirmar_reerguer.bind(decisor, quem))
+
+
+func _confirmar_reerguer(decisor, quem) -> void:
+	if selecionados.size() == mini(3, quem.mao.size()):
+		decisor.responder(selecionados.duplicate())
+
+
+func _tela_mercador(decisor, quem, oferta: Array) -> void:
+	selecionados = []
+	_perguntar("%sMercador! Marque os itens que quer comprar. Você tem %d moedas." % [_vez(quem), quem.moedas])
 	for item in oferta:
 		_alternavel("%s (%d)\n%s" % [item["nome"], int(item["preco_mercador"]), item["efeito"]], item)
-	_botao("Comprar marcados", _confirmar_mercador)
+	_botao("Comprar marcados", _confirmar_mercador.bind(decisor, quem))
 	_botao("Não comprar nada", decisor.responder.bind([]))
 
 
-func _confirmar_mercador() -> void:
+func _confirmar_mercador(decisor, quem) -> void:
 	var total := 0
 	for item in selecionados:
 		total += int(item["preco_mercador"])
-	if total > jogador.moedas:
-		rotulo_pergunta.text = "Os itens marcados custam %d e você tem %d moedas." % [total, jogador.moedas]
+	if total > quem.moedas:
+		rotulo_pergunta.text = "Os itens marcados custam %d e você tem %d moedas." % [total, quem.moedas]
 		return
 	decisor.responder(selecionados.map(func(i): return i["id"]))
 
 
-func _tela_reposicao(reveladas: Array, pagaveis: Array) -> void:
+func _tela_reposicao(decisor, quem, reveladas: Array, pagaveis: Array) -> void:
 	var nomes := ", ".join(reveladas.map(func(c): return _nome_curto(c)))
-	_perguntar("Reposição: saíram %s. Escolha quem entra em campo pagando o Prestígio; a outra carta vai ao Cemitério." % nomes)
+	_perguntar(_vez(quem) + "Reposição: saíram %s. Escolha quem entra em campo pagando o Prestígio; a outra carta vai ao Cemitério." % nomes)
 	for c in pagaveis:
 		_botao("%s (%d moedas)" % [_rotulo_cavaleiro(c), c.custo()], decisor.responder.bind(c))
 
 
-func _tela_cavaleiro_evento(evento_id: String) -> void:
+func _tela_cavaleiro_evento(decisor, quem, evento_id: String) -> void:
 	var ev: Dictionary = cat.eventos[evento_id]
-	_perguntar("%s\n%s\nEscolha o Cavaleiro." % [ev["nome"], ev["efeito"]])
-	for c in jogador.fila:
+	_perguntar("%s%s\n%s\nEscolha o Cavaleiro." % [_vez(quem), ev["nome"], ev["efeito"]])
+	for c in quem.fila:
 		_botao(_rotulo_cavaleiro(c), decisor.responder.bind(c.id_instancia))
 
 
-func _tela_descarte(dados: Dictionary) -> void:
+func _tela_descarte(decisor, quem, dados: Dictionary) -> void:
 	var ev: Dictionary = cat.eventos[dados["evento"]]
-	_perguntar(dados.get("texto", "%s\n%s" % [ev["nome"], ev["efeito"]]))
+	_perguntar(_vez(quem) + dados.get("texto", "%s\n%s" % [ev["nome"], ev["efeito"]]))
 	_botao(dados["recusa"], decisor.responder.bind(null))
-	for c in jogador.mao:
+	for c in quem.mao:
 		_botao("Descartar %s" % _nome_curto(c), decisor.responder.bind(c.id_instancia))
-	for item in jogador.itens_mao:
+	for item in quem.itens_mao:
 		_botao("Descartar %s" % item["nome"], decisor.responder.bind(item["id"]))

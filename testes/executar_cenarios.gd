@@ -17,7 +17,7 @@ var verificacoes := 0
 
 func _initialize() -> void:
 	# Compila também os scripts que os cenários não usam, como a mesa 3D.
-	for caminho in ["res://scripts/apresentacao/principal.gd"]:
+	for caminho in ["res://scripts/apresentacao/principal.gd", "res://scripts/apresentacao/menu.gd"]:
 		var script = load(caminho)
 		if script == null or not script.can_instantiate():
 			falhas.append("Script não compila: " + caminho)
@@ -66,7 +66,7 @@ func _rodar(cat, cenario: Dictionary) -> void:
 		dec.iniciais = cat.config["mao_inicial_em_campo"]
 		decisores[id] = dec
 		var j = partida.adicionar_jogador(id, cat.config["ordem_pessoal_de_teste_do_topo"], dec)
-		partida.preparar_inicio(j, false)
+		await partida.preparar_inicio(j, false)
 		_checar(nome + " início " + id, Jogador.ids(j.fila), cat.config["mao_inicial_em_campo"], "fila inicial")
 		_checar(nome + " início " + id, Jogador.ids(j.mao), cat.config["mao_inicial_restante"], "mão inicial")
 		_checar(nome + " início " + id, j.moedas, cat.config["moedas_iniciais"], "moedas iniciais")

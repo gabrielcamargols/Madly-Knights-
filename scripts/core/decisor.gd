@@ -53,6 +53,11 @@ func descarte_plataforma(_partida, _jogador) -> Variant:
 	return null
 
 
+## Quem ataca neste golpe, entre os permitidos pela regra (o primeiro vem antes).
+func escolher_atacante(_partida, _jogador, opcoes: Array, _inimigo) -> Variant:
+	return opcoes[0]
+
+
 func usar_habilidade(_partida, _jogador, _cavaleiro, _habilidade: String) -> bool:
 	return false
 

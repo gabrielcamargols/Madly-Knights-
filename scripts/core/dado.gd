@@ -2,6 +2,8 @@ extends RefCounted
 ## D6 resolvido pela lógica do jogo. A apresentação só mostra o resultado.
 ## No modo controlado consome uma lista de {motivo, face} e confere o motivo.
 
+signal rolou(motivo: String, face: int)
+
 var controlado := false
 var registro: Array = []  # {motivo, face}
 var erros: Array = []
@@ -39,4 +41,5 @@ func rolar(motivo: String) -> int:
 	else:
 		face = _rng.randi_range(1, 6)
 	registro.append({"motivo": motivo, "face": face})
+	rolou.emit(motivo, face)
 	return face

@@ -38,6 +38,10 @@ func ordem_de_empate(_partida, jogador, grupo: Array) -> Array:
 	return grupo
 
 
+func escolher_atacante(_partida, jogador, opcoes: Array, inimigo) -> Variant:
+	return await _perguntar("ataque", {"jogador": jogador, "opcoes": opcoes, "inimigo": inimigo})
+
+
 func itens_para_comprar(_partida, jogador, oferta: Array) -> Array:
 	var r = await _perguntar("mercador", {"jogador": jogador, "oferta": oferta})
 	return r if r is Array else []

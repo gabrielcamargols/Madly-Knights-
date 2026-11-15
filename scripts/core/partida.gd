@@ -546,7 +546,7 @@ func _combate(j, carta_id: String) -> String:
 	while ini.vivo():
 		if j.fila.is_empty():
 			return await _derrota_total(j, ini)
-		var atacante = j.fila[0]
+		var atacante = await _escolher_atacante(j, ini)
 		ultimo = atacante
 		_ataque_do_cavaleiro(j, atacante, ini)
 		await _pausa()
@@ -558,6 +558,15 @@ func _combate(j, carta_id: String) -> String:
 		await _pausa()
 	_vitoria(j, ultimo, ini)
 	return "ok"
+
+
+## O primeiro da fila ataca. Fila do Café: o Pão com Manteiga em segundo pode atacar no lugar.
+func _escolher_atacante(j, ini) -> Variant:
+	var opcoes: Array = [j.fila[0]]
+	if j.fila.size() > 1 and j.fila[1].id_carta == "cavaleiro_pao_com_manteiga":
+		opcoes.append(j.fila[1])
+	var escolhido = await decisores[j.id].escolher_atacante(self, j, opcoes, ini)
+	return escolhido if opcoes.has(escolhido) else opcoes[0]
 
 
 func _pausa() -> void:

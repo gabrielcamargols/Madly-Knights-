@@ -41,7 +41,7 @@ O GitHub Actions roda os mesmos comandos a cada envio (`.github/workflows/testes
 ## Ainda não implementado
 
 - Duelos entre jogadores, Cidade Central e seus defensores, fase final e roubo de Espadas.
-- Habilidades opcionais que dependem de vários inimigos ou de turno extra: Bafo pela Viseira (Dragão), Rajada de Garras (Tigre), Fila do Café (Pão com Manteiga), Elmo do Papagaio Copiador, A Grande Coxa de Frango, Ampulheta do Turno Extra e Capa Invisível.
+- Habilidades opcionais que dependem de vários inimigos ou de turno extra: Bafo pela Viseira (Dragão), Rajada de Garras (Tigre), Elmo do Papagaio Copiador, A Grande Coxa de Frango, Ampulheta do Turno Extra e Capa Invisível.
 - Interface para as escolhas do jogador. Por enquanto a mesa 3D usa as decisões padrão (`decisor.gd`): não compra itens, converte Prestígio em moedas e recusa habilidades opcionais.
 
 ## Dados

@@ -35,7 +35,7 @@ jobs:
       - name: Capturas da mesa jogável
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
-          xvfb-run -a -s "-screen 0 720x1280x24" ./godot --path . --rendering-driver opengl3 --resolution 720x1280 -s res://testes/captura.gd 2>&1 | tee captura.txt
+          xvfb-run -a -s "-screen 0 1280x720x24" ./godot --path . --rendering-driver opengl3 --resolution 1280x720 -s res://testes/captura.gd 2>&1 | tee captura.txt
           if grep -q "SCRIPT ERROR" captura.txt; then echo "Erro de script na mesa"; exit 1; fi
           ls capturas
           for f in capturas/*.png; do echo "IMG_INICIO $f"; base64 -w0 "$f"; echo; echo "IMG_FIM"; done

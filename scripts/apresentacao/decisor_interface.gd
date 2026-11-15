@@ -38,6 +38,10 @@ func ordem_de_empate(_partida, jogador, grupo: Array) -> Array:
 	return grupo
 
 
+func lancar_dado(_partida, jogador, motivo: String) -> Variant:
+	return await _perguntar("lancar_dado", {"jogador": jogador, "motivo": motivo})
+
+
 func escolher_atacante(_partida, jogador, opcoes: Array, inimigo) -> Variant:
 	return await _perguntar("ataque", {"jogador": jogador, "opcoes": opcoes, "inimigo": inimigo})
 

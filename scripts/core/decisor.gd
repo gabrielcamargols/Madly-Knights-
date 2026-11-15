@@ -58,6 +58,11 @@ func escolher_atacante(_partida, _jogador, opcoes: Array, _inimigo) -> Variant:
 	return opcoes[0]
 
 
+## A interface entrega o dado e espera o jogador lançar. O valor vem da lógica.
+func lancar_dado(_partida, _jogador, _motivo: String) -> Variant:
+	return null
+
+
 func usar_habilidade(_partida, _jogador, _cavaleiro, _habilidade: String) -> bool:
 	return false
 

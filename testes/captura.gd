@@ -45,7 +45,16 @@ func _initialize() -> void:
 		await _esperar(0.4)
 		if _botao_existe("Próximo turno") or cena.partida.playtest_encerrado:
 			break
-		if cena.modo == "ataque":
+		if cena.camada_dado.visible and cena.dado_aguardando:
+			_salvar_uma_vez("8a_jogue_o_dado")
+			cena._lancar_dado()
+			await _esperar(0.3)
+			_salvar_uma_vez("8b_dado_girando")
+			await _esperar(0.7)
+			_salvar_uma_vez("8c_resultado_do_dado")
+		elif cena.camada_dado.visible:
+			pass
+		elif cena.modo == "ataque":
 			_salvar_uma_vez("6_vez_de_atacar")
 			cena.atacar()
 			await _esperar(0.25)

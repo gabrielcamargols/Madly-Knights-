@@ -73,7 +73,7 @@ func _rodar(cat, cenario: Dictionary) -> void:
 
 	if cenario.has("d6_iniciativa"):
 		dado.fixar(cenario["d6_iniciativa"])
-		partida.definir_ordem_de_turno()
+		await partida.definir_ordem_de_turno()
 		_conferir_dado(nome + " iniciativa", dado)
 
 	var numero := 0

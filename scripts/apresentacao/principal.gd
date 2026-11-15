@@ -81,6 +81,17 @@ var camada_detalhes: Control
 var texto_detalhes: RichTextLabel
 var carta_detalhes: CenterContainer
 var rotulo_dado: Label
+# Janela do dado
+var camada_dado: Control
+var titulo_dado: Label
+var area_dado: Control
+var dado_visual: Control
+var resultado_dado: Label
+var botao_jogar: Button
+var dado_aguardando := false
+var girando := false
+var face_pendente := 0
+var arrastando_dado := false
 
 
 func _ready() -> void:
@@ -120,6 +131,7 @@ func nova_partida() -> void:
 	partida.com_pausas = true
 	partida.passo_de_combate.connect(_ritmo_do_combate)
 	partida.dado.rolou.connect(_ao_rolar)
+	partida.dado_mostrado.connect(_ao_dado_mostrado)
 	partida.montar_mesa()
 	for k in clampi(Sessao.jogadores, 1, 4):
 		var decisor = DecisorInterface.new()
@@ -473,6 +485,8 @@ func _numero_flutuante(posicao: Vector3, valor: int) -> void:
 
 
 func _ao_rolar(motivo: String, face: int) -> void:
+	if partida.rolando_em_janela:
+		return  # esta rolagem aparece na janela do dado
 	rotulo_dado.text = "%s\nD6: %d" % [_motivo_legivel(motivo), face]
 	rotulo_dado.visible = true
 	rotulo_dado.modulate.a = 1.0
@@ -491,6 +505,12 @@ func _motivo_legivel(motivo: String) -> String:
 		return "Ataque: %s" % _nome_por_chave(motivo.substr(7))
 	if motivo.begins_with("iniciativa_"):
 		return "Iniciativa: Jogador %s" % motivo.substr(12)
+	var nomes := {"ponte_": "Ponte Despencando", "areia_": "Areia Movediça", "gato_": "Gato de Botas", "furacao_": "Furacão Tubarão",
+		"escorregao_tatico_": "Escorregão Tático", "passo_apressado_": "Botas do Corre-Corre", "nao_valeu_": "Não Valeu!",
+		"honra_rival_": "Lute por Honra: rival", "honra_": "Lute por Honra", "calda_imperial": "Calda Imperial"}
+	for prefixo in nomes:
+		if motivo.begins_with(prefixo):
+			return nomes[prefixo]
 	return motivo.replace("_", " ").capitalize()
 
 
@@ -1175,6 +1195,44 @@ func _criar_interface() -> void:
 	rotulo_dado.pivot_offset = Vector2(300, 60)
 	rotulo_dado.visible = false
 
+	# Janela do dado: o jogo entrega o dado e o jogador lança.
+	camada_dado = _camada_central(raiz)
+	var painel_dado := PanelContainer.new()
+	painel_dado.add_theme_stylebox_override("panel", _estilo(Color(0.1, 0.09, 0.08, 0.97), COR_OURO, 3, 18, 20))
+	camada_dado.get_child(1).add_child(painel_dado)
+	var coluna_dado := VBoxContainer.new()
+	coluna_dado.add_theme_constant_override("separation", 10)
+	painel_dado.add_child(coluna_dado)
+	titulo_dado = Label.new()
+	titulo_dado.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	titulo_dado.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	titulo_dado.custom_minimum_size = Vector2(460, 0)
+	titulo_dado.add_theme_font_size_override("font_size", 26)
+	coluna_dado.add_child(titulo_dado)
+	area_dado = Control.new()
+	area_dado.custom_minimum_size = Vector2(460, 230)
+	coluna_dado.add_child(area_dado)
+	dado_visual = Control.new()
+	dado_visual.custom_minimum_size = Vector2(140, 140)
+	dado_visual.size = Vector2(140, 140)
+	dado_visual.pivot_offset = Vector2(70, 70)
+	dado_visual.gui_input.connect(_ao_tocar_dado)
+	area_dado.add_child(dado_visual)
+	resultado_dado = Label.new()
+	resultado_dado.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	resultado_dado.add_theme_font_size_override("font_size", 30)
+	resultado_dado.add_theme_color_override("font_color", COR_OURO)
+	coluna_dado.add_child(resultado_dado)
+	botao_jogar = Button.new()
+	botao_jogar.text = "Jogar!"
+	botao_jogar.custom_minimum_size = Vector2(0, 70)
+	botao_jogar.add_theme_font_size_override("font_size", 30)
+	botao_jogar.add_theme_stylebox_override("normal", _estilo(Color(0.2, 0.5, 0.25), Color(0.6, 1, 0.6)))
+	botao_jogar.add_theme_stylebox_override("hover", _estilo(Color(0.25, 0.6, 0.3), Color(0.7, 1, 0.7)))
+	botao_jogar.pressed.connect(_lancar_dado)
+	coluna_dado.add_child(botao_jogar)
+	camada_dado.visible = false
+
 	# Detalhes de uma carta, também centralizados.
 	camada_detalhes = _camada_central(raiz)
 	var detalhes := PanelContainer.new()
@@ -1273,6 +1331,135 @@ func _acao(texto: String, acao: Callable, ativo: bool = true, principal: bool = 
 	acoes.add_child(b)
 
 
+# --- Janela do dado ------------------------------------------------------------
+# O jogo entrega o dado; o jogador arrasta e solta (ou toca em "Jogar!"). O valor
+# é sorteado pela lógica no momento do lançamento e a janela só o mostra.
+
+const PINTAS := {1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8]}
+
+
+func _face_dado(n: int) -> PanelContainer:
+	var face := PanelContainer.new()
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	face.custom_minimum_size = Vector2(140, 140)
+	face.add_theme_stylebox_override("panel", _estilo(Color(0.98, 0.96, 0.9), Color(0.55, 0.45, 0.3), 5, 26, 16))
+	var grade := GridContainer.new()
+	grade.columns = 3
+	grade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	grade.add_theme_constant_override("h_separation", 8)
+	grade.add_theme_constant_override("v_separation", 8)
+	face.add_child(grade)
+	for i in 9:
+		var pinta := PanelContainer.new()
+		pinta.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pinta.custom_minimum_size = Vector2(28, 28)
+		var cor := Color(0.12, 0.1, 0.1) if PINTAS[n].has(i) else Color(0, 0, 0, 0)
+		pinta.add_theme_stylebox_override("panel", _estilo(cor, cor, 0, 20, 0))
+		grade.add_child(pinta)
+	return face
+
+
+func _desenhar_dado(n: int) -> void:
+	for filho in dado_visual.get_children():
+		dado_visual.remove_child(filho)
+		filho.queue_free()
+	dado_visual.add_child(_face_dado(n))
+
+
+func _centro_dado() -> Vector2:
+	return (area_dado.custom_minimum_size - dado_visual.size) / 2
+
+
+func _abrir_dado(titulo: String, do_jogador: bool) -> void:
+	titulo_dado.text = titulo
+	resultado_dado.text = "Arraste e solte o dado, ou toque em Jogar!" if do_jogador else ""
+	botao_jogar.visible = do_jogador
+	botao_jogar.disabled = not do_jogador
+	dado_visual.position = _centro_dado()
+	dado_visual.rotation = 0
+	dado_visual.scale = Vector2.ONE
+	_desenhar_dado(randi_range(1, 6))
+	camada_dado.visible = true
+
+
+func _ao_tocar_dado(evento: InputEvent) -> void:
+	if not dado_aguardando:
+		return
+	if evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT:
+		arrastando_dado = evento.pressed
+		if not evento.pressed:
+			_lancar_dado()
+	elif evento is InputEventMouseMotion and arrastando_dado:
+		dado_visual.position += evento.relative
+		dado_visual.rotation += evento.relative.x * 0.01
+
+
+## O jogador lança: o dado gira e a lógica sorteia o valor.
+func _lancar_dado() -> void:
+	if not dado_aguardando:
+		return
+	dado_aguardando = false
+	arrastando_dado = false
+	botao_jogar.disabled = true
+	resultado_dado.text = ""
+	var tween := create_tween()
+	tween.tween_property(dado_visual, "position", _centro_dado(), 0.35).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	_iniciar_giro()
+	decisor_atual.responder(null)
+
+
+func _iniciar_giro() -> void:
+	girando = true
+	face_pendente = 0
+	_girar()
+
+
+func _girar() -> void:
+	var inicio := tempo
+	while face_pendente == 0 or tempo - inicio < 0.75:
+		_desenhar_dado(randi_range(1, 6))
+		dado_visual.rotation = randf_range(-0.6, 0.6)
+		await get_tree().create_timer(0.06).timeout
+	dado_visual.rotation = 0
+	_desenhar_dado(face_pendente)
+	dado_visual.scale = Vector2(1.3, 1.3)
+	var tween := create_tween()
+	tween.tween_property(dado_visual, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK)
+	girando = false
+
+
+## A lógica sorteou: o dado para nesse número e a janela fecha.
+func _ao_dado_mostrado(motivo: String, face: int, do_jogador: bool) -> void:
+	if not do_jogador:
+		_abrir_dado(_motivo_legivel(motivo), false)
+		_iniciar_giro()
+	elif not girando:
+		_iniciar_giro()
+	face_pendente = face
+	while girando:
+		await get_tree().process_frame
+	resultado_dado.text = _significado_do_dado(motivo, face)
+	await get_tree().create_timer(1.0 if do_jogador else 0.7).timeout
+	camada_dado.visible = false
+	partida.continuar.emit()
+
+
+func _significado_do_dado(motivo: String, face: int) -> String:
+	if motivo.begins_with("ataque_") or motivo.begins_with("contra_ataque_") or motivo.begins_with("ataque_rival_"):
+		match face:
+			1:
+				return "1 — Errou o golpe!"
+			2:
+				return "2 — Golpe de raspão (1 de dano)"
+			3:
+				return "3 — Meio acerto (metade da Força)"
+			4, 5:
+				return "%d — Acerto completo!" % face
+			6:
+				return "6 — Acerto crítico! (dobro da Força)"
+	return "Tirou %d" % face
+
+
 # --- Preparação da partida (manual §4) -----------------------------------------
 # Reino inicial, 6 moedas, 5 Cavaleiros, mulligan, 3 em campo de graça e fila por
 # Honra (o dono decide empates). Com vários jogadores, o maior D6 começa.
@@ -1356,7 +1543,8 @@ func _tela_iniciativa() -> void:
 
 
 func _rolar_iniciativa() -> void:
-	partida.definir_ordem_de_turno()
+	_fechar_escolha()
+	await partida.definir_ordem_de_turno()
 	var rolagens: Array = partida.dado.registro.filter(func(r): return r["motivo"].begins_with("iniciativa_"))
 	var texto := ", ".join(rolagens.map(func(r): return "Jogador %s tirou %d" % [r["motivo"].substr(12), r["face"]]))
 	_abrir_escolha("%s.\n%s começa!" % [texto, _nome(partida.jogadores[0])])
@@ -1472,6 +1660,9 @@ func _ao_pedido(tipo: String, dados: Dictionary, decisor) -> void:
 	modo = ""
 	_atualizar(true)
 	match tipo:
+		"lancar_dado":
+			dado_aguardando = true
+			_abrir_dado("%sSua vez de jogar o dado!\n%s" % [vez, _motivo_legivel(dados["motivo"])], true)
 		"ataque":
 			modo = "ataque"
 			opcoes_ataque = dados["opcoes"]

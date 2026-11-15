@@ -6,6 +6,8 @@ signal registrou(texto: String)
 signal revelou(carta_id: String)
 signal passo_de_combate
 signal continuar
+## Com pausas ligadas, cada rolagem "na janela" emite este sinal e espera `continuar`.
+signal dado_mostrado(motivo: String, face: int, do_jogador: bool)
 
 const Regras = preload("res://scripts/core/regras.gd")
 const Cavaleiro = preload("res://scripts/core/cavaleiro.gd")
@@ -33,6 +35,7 @@ var inimigo_atual = null  # inimigo do encontro em curso (ou o último), para a 
 ## Com pausas ligadas, a lógica emite `passo_de_combate` entre os golpes e espera
 ## a apresentação emitir `continuar`. Os testes deixam desligado.
 var com_pausas := false
+var rolando_em_janela := false  # a rolagem atual vai aparecer na janela do dado
 
 
 func _init(p_catalogo, p_dado, p_embaralhador) -> void:
@@ -183,7 +186,7 @@ func definir_ordem_de_turno() -> void:
 		var faces := {}
 		var maior := 0
 		for j in candidatos:
-			var face: int = dado.rolar("iniciativa_" + j.id)
+			var face: int = await _rolar_do_jogador(j, "iniciativa_" + j.id)
 			faces[j] = face
 			maior = maxi(maior, face)
 		var vencedores := candidatos.filter(func(j): return faces[j] == maior)
@@ -548,13 +551,13 @@ func _combate(j, carta_id: String) -> String:
 			return await _derrota_total(j, ini)
 		var atacante = await _escolher_atacante(j, ini)
 		ultimo = atacante
-		_ataque_do_cavaleiro(j, atacante, ini)
+		await _ataque_do_cavaleiro(j, atacante, ini)
 		await _pausa()
 		if not ini.vivo():
 			break
 		if not atacante.vivo():
 			continue
-		_contra_ataque(j, atacante, ini)
+		await _contra_ataque(j, atacante, ini)
 		await _pausa()
 	_vitoria(j, ultimo, ini)
 	return "ok"
@@ -567,6 +570,29 @@ func _escolher_atacante(j, ini) -> Variant:
 		opcoes.append(j.fila[1])
 	var escolhido = await decisores[j.id].escolher_atacante(self, j, opcoes, ini)
 	return escolhido if opcoes.has(escolhido) else opcoes[0]
+
+
+## Rolagem que o jogador faz: com pausas ligadas, a interface entrega o dado e espera
+## o lançamento. O resultado continua vindo da lógica (dado.rolar).
+func _rolar_do_jogador(j, motivo: String) -> int:
+	if com_pausas:
+		await decisores[j.id].lancar_dado(self, j, motivo)
+	return await _rolar_visivel(motivo, true)
+
+
+## Rolagem do inimigo ou do jogo: aparece na janela do dado, mas rola sozinha.
+func _rolar_automatico(motivo: String) -> int:
+	return await _rolar_visivel(motivo, false)
+
+
+func _rolar_visivel(motivo: String, do_jogador: bool) -> int:
+	rolando_em_janela = com_pausas
+	var face: int = dado.rolar(motivo)
+	rolando_em_janela = false
+	if com_pausas:
+		dado_mostrado.emit(motivo, face, do_jogador)
+		await continuar
+	return face
 
 
 func _pausa() -> void:
@@ -618,17 +644,17 @@ func _ataque_do_cavaleiro(j, c, ini) -> void:
 		_anotar_armadura(ini)
 	var modificador := 0
 	if ini.id == "imperador_panqueca":
-		var calda: int = dado.rolar("calda_imperial")
+		var calda: int = await _rolar_automatico("calda_imperial")
 		if calda <= 3:
 			modificador -= 1
 		else:
 			_ferir_inimigo(ini, 3)
 			if not ini.vivo():
 				return
-	var face: int = dado.rolar("ataque_" + ch)
+	var face: int = await _rolar_do_jogador(j, "ataque_" + ch)
 	# Novas rolagens
 	if face == 1 and c.tem_item("botas_do_corre_corre") and _quer(j, c, "Passo Apressado") and c.usar("Passo Apressado"):
-		face = dado.rolar("passo_apressado_" + ch)
+		face = await _rolar_do_jogador(j, "passo_apressado_" + ch)
 	# Modificadores: Porquinhos primeiro
 	if ini.id == "porquinhos_viloes":
 		face = maxi(1, face - 1)
@@ -669,15 +695,15 @@ func _contra_ataque(j, alvo, ini) -> void:
 	relatorio["contra_ataques"] += 1
 	var falhou := false
 	if alvo.id_carta == "cavaleiro_banana" and alvo.usar("Escorregão Tático"):
-		var escorregao: int = dado.rolar("escorregao_tatico_" + Regras.chave(alvo.id_instancia))
+		var escorregao: int = await _rolar_do_jogador(j, "escorregao_tatico_" + Regras.chave(alvo.id_instancia))
 		if escorregao >= 5:
 			falhou = true
 			registrar("Escorregão Tático! O ataque de %s falha." % ini.nome)
 	if not falhou:
 		var ch := Regras.chave(ini.id)
-		var face: int = dado.rolar("contra_ataque_" + ch)
+		var face: int = await _rolar_automatico("contra_ataque_" + ch)
 		if alvo.tem_item("capacete_do_nao_valeu") and _quer(j, alvo, "Não Valeu!") and alvo.usar("Não Valeu!"):
-			face = dado.rolar("nao_valeu_" + ch)
+			face = await _rolar_do_jogador(j, "nao_valeu_" + ch)
 		if ini.id == "porquinhos_viloes":
 			face = mini(6, face + 1)
 			if face == 6:
@@ -839,9 +865,9 @@ func _evento(j, id: String) -> void:
 		"o_chao_e_lava":
 			await _chao_e_lava(participantes)
 		"lute_por_honra":
-			_lute_por_honra(j)
+			await _lute_por_honra(j)
 		"furacao_tubarao":
-			_furacao(j)
+			await _furacao(j)
 		_:
 			registrar("Evento sem implementação: %s" % id)
 
@@ -877,7 +903,7 @@ func _ponte(participantes: Array) -> void:
 		if _descartar_da_mao(p, descarte):
 			atravessou = true
 		else:
-			var face: int = dado.rolar("ponte_" + p.id)
+			var face: int = await _rolar_do_jogador(p, "ponte_" + p.id)
 			if face >= 4:
 				atravessou = true
 			else:
@@ -896,7 +922,7 @@ func _areia(p) -> void:
 	var c = await _cavaleiro_escolhido(p, "areia_movedica")
 	if c == null:
 		return
-	var face: int = dado.rolar("areia_" + Regras.chave(c.id_instancia))
+	var face: int = await _rolar_do_jogador(p, "areia_" + Regras.chave(c.id_instancia))
 	var descarte = await decisores[p.id].descarte_areia(self, p, c, face)
 	if _descartar_da_mao(p, descarte):
 		face = mini(6, face + 2)
@@ -919,7 +945,7 @@ func _gato(p) -> void:
 	var c = await _cavaleiro_escolhido(p, "gato_de_botas")
 	if c == null:
 		return
-	var face: int = dado.rolar("gato_" + Regras.chave(c.id_instancia))
+	var face: int = await _rolar_do_jogador(p, "gato_" + Regras.chave(c.id_instancia))
 	if c.tem_categoria("Arma"):
 		face = mini(6, face + 1)
 	if face <= 2:
@@ -951,7 +977,7 @@ func _chao_e_lava(participantes: Array) -> void:
 
 
 func _furacao(j) -> void:
-	var face: int = dado.rolar("furacao_" + j.id)
+	var face: int = await _rolar_do_jogador(j, "furacao_" + j.id)
 	if face <= 2:
 		_dano_em_todos(j, 3)
 	elif face >= 4:
@@ -980,17 +1006,17 @@ func _lute_por_honra(j) -> void:
 		vez_do_meu = meu.honra() > rival.honra()
 	else:
 		while true:
-			var a: int = dado.rolar("honra_" + Regras.chave(meu.id_instancia))
-			var b: int = dado.rolar("honra_rival_" + Regras.chave(rival.id_instancia))
+			var a: int = await _rolar_do_jogador(j, "honra_" + Regras.chave(meu.id_instancia))
+			var b: int = await _rolar_automatico("honra_rival_" + Regras.chave(rival.id_instancia))
 			if a != b:
 				vez_do_meu = a > b
 				break
 	while meu.vivo() and rival.vivo():
 		if vez_do_meu:
-			var f: int = dado.rolar("ataque_" + Regras.chave(meu.id_instancia))
+			var f: int = await _rolar_do_jogador(j, "ataque_" + Regras.chave(meu.id_instancia))
 			rival.sofrer(Regras.dano(f, meu.forca_total()))
 		else:
-			var f2: int = dado.rolar("ataque_rival_" + Regras.chave(rival.id_instancia))
+			var f2: int = await _rolar_automatico("ataque_rival_" + Regras.chave(rival.id_instancia))
 			_ferir_cavaleiro(j, meu, Regras.dano(f2, rival.forca_total()), rival)
 		vez_do_meu = not vez_do_meu
 	if meu.vivo():

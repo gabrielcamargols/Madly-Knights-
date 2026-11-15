@@ -47,3 +47,7 @@ O GitHub Actions roda os mesmos comandos a cada envio (`.github/workflows/testes
 ## Dados
 
 `dados/itens.json` ganhou os campos `bonus_forca`, `bonus_armadura` e `bonus_prestigio`, extraídos do texto dos efeitos passivos. Os efeitos condicionais continuam no texto e estão na lógica.
+
+## Ilustrações
+
+`arte/cavaleiros/<id do Cavaleiro>.jpg` guarda as ilustrações aprovadas (lotes 1, 2, 3 e 10), reduzidas para 448×560 para a versão web. A carta mostra a arte de corpo inteiro quando o arquivo existe; sem ele, usa a cor da carta e a inicial. Variantes (`id__variante`) usam a arte do Cavaleiro base. Dragão, Tigre e Rosquinha de Chocolate, do baralho de teste, ainda não têm ilustração.

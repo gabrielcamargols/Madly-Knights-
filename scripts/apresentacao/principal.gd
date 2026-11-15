@@ -457,11 +457,47 @@ func _moldura(cor_fundo: Color, borda: Color, tamanho: Vector2, espessura: int) 
 	return painel
 
 
-## Cavaleiro. estado: "", "marcada", "destaque", "opcao", "apagada" ou "caido".
+## Ilustração aprovada do Cavaleiro, se houver (arte/cavaleiros/<id>.jpg).
+var _artes: Dictionary = {}
+
+
+func _textura_arte(id_carta: String) -> Texture2D:
+	var base: String = id_carta.split("__")[0]
+	if not _artes.has(base):
+		var caminho := "res://arte/cavaleiros/%s.jpg" % base
+		_artes[base] = load(caminho) if ResourceLoader.exists(caminho) else null
+	return _artes[base]
+
+
+## Ilustração cobrindo todo o quadro, recortada para caber.
+func _ilustracao(textura: Texture2D, e: float) -> PanelContainer:
+	var quadro := PanelContainer.new()
+	quadro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	quadro.clip_contents = true
+	quadro.add_theme_stylebox_override("panel", _estilo(Color.BLACK, Color.BLACK, 0, int(10 * e), 0))
+	var imagem := TextureRect.new()
+	imagem.texture = textura
+	imagem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	imagem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	imagem.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	quadro.add_child(imagem)
+	return quadro
+
+
+## Faixa escura semitransparente para o texto ficar legível sobre a arte.
+func _faixa(e: float, opacidade: float = 0.62) -> PanelContainer:
+	var faixa := PanelContainer.new()
+	faixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	faixa.add_theme_stylebox_override("panel", _estilo(Color(0, 0, 0, opacidade), Color(0, 0, 0, 0), 0, int(8 * e), int(3 * e)))
+	return faixa
+
+
+## Cavaleiro com arte de corpo inteiro; nome e atributos por cima.
+## estado: "", "marcada", "destaque", "opcao", "apagada" ou "caido".
 func _face_cavaleiro(c, tamanho: Vector2, estado: String = "") -> PanelContainer:
 	var e := tamanho.x / 140.0
 	var cor := _cor_do_cavaleiro(c)
-	var borda := Color(0.55, 0.45, 0.25)
+	var borda := cor.darkened(0.25)
 	var espessura := int(4 * e)
 	match estado:
 		"marcada":
@@ -473,29 +509,48 @@ func _face_cavaleiro(c, tamanho: Vector2, estado: String = "") -> PanelContainer
 		"opcao":
 			borda = Color(0.4, 0.85, 1)
 			espessura = int(6 * e)
-	var painel := _moldura(Color(0.13, 0.11, 0.09), borda, tamanho, espessura)
+	var painel := PanelContainer.new()
+	painel.custom_minimum_size = tamanho
+	painel.pivot_offset = tamanho / 2
+	painel.add_theme_stylebox_override("panel", _estilo(Color(0.1, 0.08, 0.07), borda, espessura, int(14 * e), espessura))
 	if estado == "apagada" or estado == "caido":
 		painel.modulate = Color(0.5, 0.5, 0.5)
+	# Fundo: a ilustração aprovada ou, enquanto não houver, a cor e a inicial.
+	var textura := _textura_arte(c.id_carta)
+	if textura != null:
+		painel.add_child(_ilustracao(textura, e))
+	else:
+		painel.add_child(_arte(cor, _nome_curto(c).left(1), 0, e))
+	# Por cima: custo e nome no topo, habilidade e atributos embaixo.
 	var coluna := _ignorar_mouse(VBoxContainer.new())
-	coluna.add_theme_constant_override("separation", int(3 * e))
+	coluna.add_theme_constant_override("separation", int(2 * e))
 	painel.add_child(coluna)
+	var faixa_topo := _faixa(e)
+	coluna.add_child(faixa_topo)
 	var topo := _ignorar_mouse(HBoxContainer.new())
 	topo.add_theme_constant_override("separation", int(4 * e))
-	coluna.add_child(topo)
-	topo.add_child(_medalhao(str(c.custo()), Color(0.2, 0.42, 0.85), e * 0.8))
-	var nome := _texto(_nome_curto(c), int(16 * e), Color.WHITE, int(4 * e))
+	faixa_topo.add_child(topo)
+	topo.add_child(_medalhao(str(c.custo()), Color(0.2, 0.42, 0.85), e * 0.75))
+	var nome := _texto(_nome_curto(c), int(15 * e), Color.WHITE, int(4 * e))
 	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	nome.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	topo.add_child(nome)
-	coluna.add_child(_arte(cor, _nome_curto(c).left(1), 52 * e, e))
+	var espaco := _ignorar_mouse(Control.new())
+	espaco.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	coluna.add_child(espaco)
+	var faixa_base := _faixa(e, 0.68)
+	coluna.add_child(faixa_base)
+	var coluna_base := _ignorar_mouse(VBoxContainer.new())
+	coluna_base.add_theme_constant_override("separation", 0)
+	faixa_base.add_child(coluna_base)
 	if c.habilidade != "":
-		var hab := _texto(c.habilidade, int(12 * e), Color(0.95, 0.88, 0.7))
+		var hab := _texto(c.habilidade, int(11 * e), Color(1, 0.9, 0.65), int(3 * e))
 		hab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		coluna.add_child(hab)
+		coluna_base.add_child(hab)
 	var base := _ignorar_mouse(HBoxContainer.new())
-	coluna.add_child(base)
+	coluna_base.add_child(base)
 	base.add_child(_medalhao(str(c.forca_total()), COR_FORCA, e))
-	var honra := _texto("Honra %d" % c.honra(), int(12 * e), Color(0.85, 0.85, 0.85))
+	var honra := _texto("Honra %d" % c.honra(), int(12 * e), Color(0.92, 0.92, 0.92), int(3 * e))
 	honra.autowrap_mode = TextServer.AUTOWRAP_OFF
 	honra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	honra.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

@@ -30,6 +30,7 @@ var selecionados: Array = []
 var rotulo_status: Label
 var rotulo_pergunta: Label
 var botoes: HFlowContainer
+var lista: VBoxContainer  # opções longas, uma por linha
 var registro: RichTextLabel
 
 
@@ -79,7 +80,7 @@ func _criar_ambiente() -> void:
 	camera.keep_aspect = Camera3D.KEEP_WIDTH
 	camera.fov = 48
 	add_child(camera)
-	camera.look_at_from_position(Vector3(0, 10.5, 7.5), Vector3(0, 0, 2.4))
+	camera.look_at_from_position(Vector3(0, 7.5, 6.0), Vector3(0, 0, 2.4))
 	var luz := DirectionalLight3D.new()
 	luz.rotation_degrees = Vector3(-60, 30, 0)
 	add_child(luz)
@@ -115,9 +116,9 @@ func _criar_carta(texto: String, cor: Color) -> Node3D:
 	var rotulo := Label3D.new()
 	rotulo.name = "Rotulo"
 	rotulo.text = texto
-	rotulo.font_size = 48
-	rotulo.pixel_size = 0.0045
-	rotulo.width = 220
+	rotulo.font_size = 40
+	rotulo.pixel_size = 0.0042
+	rotulo.width = 240
 	rotulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rotulo.rotation_degrees.x = -90
 	rotulo.position.y = 0.04
@@ -234,6 +235,9 @@ func _criar_interface() -> void:
 	botoes.add_theme_constant_override("h_separation", 8)
 	botoes.add_theme_constant_override("v_separation", 8)
 	coluna.add_child(botoes)
+	lista = VBoxContainer.new()
+	lista.add_theme_constant_override("separation", 6)
+	coluna.add_child(lista)
 	registro = RichTextLabel.new()
 	registro.custom_minimum_size = Vector2(0, 190)
 	registro.scroll_following = true
@@ -243,9 +247,10 @@ func _criar_interface() -> void:
 
 func _perguntar(texto: String) -> void:
 	rotulo_pergunta.text = texto
-	for b in botoes.get_children():
-		botoes.remove_child(b)
-		b.queue_free()
+	for recipiente in [botoes, lista]:
+		for b in recipiente.get_children():
+			recipiente.remove_child(b)
+			b.queue_free()
 
 
 func _botao(texto: String, acao: Callable, ativo: bool = true) -> Button:
@@ -264,7 +269,13 @@ func _alternavel(texto: String, valor) -> Button:
 	b.toggle_mode = true
 	b.custom_minimum_size = Vector2(0, 54)
 	b.toggled.connect(_marcar.bind(valor))
-	botoes.add_child(b)
+	if "\n" in texto:
+		# Opção longa: ocupa a linha inteira e quebra o texto.
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		lista.add_child(b)
+	else:
+		botoes.add_child(b)
 	return b
 
 

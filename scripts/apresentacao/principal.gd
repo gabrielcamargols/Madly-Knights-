@@ -207,12 +207,12 @@ func _ajustar_camera() -> void:
 	var tamanho := get_viewport().get_visible_rect().size
 	if tamanho.x >= tamanho.y:
 		camera.keep_aspect = Camera3D.KEEP_HEIGHT
-		camera.fov = 44
-		camera.look_at_from_position(Vector3(0.3, 8.6, 4.6), Vector3(0.3, 0, 0.15))
+		camera.fov = 40
+		camera.look_at_from_position(Vector3(0, 6.4, 5.6), Vector3(0, 0, -0.35))
 	else:
 		camera.keep_aspect = Camera3D.KEEP_WIDTH
-		camera.fov = 72
-		camera.look_at_from_position(Vector3(0, 9.5, 6.0), Vector3(0, 0, 1.4))
+		camera.fov = 70
+		camera.look_at_from_position(Vector3(0, 8.0, 7.0), Vector3(0, 0, 0.6))
 
 
 ## Carta da mesa: um quadro deitado com a textura de uma carta 2D desenhada num SubViewport.

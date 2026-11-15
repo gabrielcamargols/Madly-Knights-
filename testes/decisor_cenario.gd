@@ -6,7 +6,7 @@ var acoes: Array = []  # ações deste jogador no turno atual
 var iniciais: Array = []  # IDs dos três Cavaleiros que entram gratuitamente
 
 
-func _acao(chave: String):
+func _acao(chave: String) -> Variant:
 	for a in acoes:
 		if a.has(chave):
 			return a[chave]
@@ -40,7 +40,7 @@ func itens_para_comprar(_partida, _jogador, _oferta: Array) -> Array:
 	return lista
 
 
-func escolher_reposicao(partida, jogador, reveladas: Array, pagaveis: Array):
+func escolher_reposicao(partida, jogador, reveladas: Array, pagaveis: Array) -> Variant:
 	var rep = _acao("na_reposicao")
 	if rep != null:
 		for c in reveladas:
@@ -61,17 +61,17 @@ func ordem_de_empate(_partida, _jogador, grupo: Array) -> Array:
 	return resultado
 
 
-func escolher_cavaleiro_evento(_partida, _jogador, _evento_id: String):
+func escolher_cavaleiro_evento(_partida, _jogador, _evento_id: String) -> Variant:
 	return _acao("escolher_cavaleiro")
 
 
-func travessia_ponte(_partida, _jogador):
+func travessia_ponte(_partida, _jogador) -> Variant:
 	if _acao("escolher") == "rolar":
 		return null
 	return _acao("descartar_da_mao")
 
 
-func descarte_areia(_partida, _jogador, _cavaleiro, _face: int):
+func descarte_areia(_partida, _jogador, _cavaleiro, _face: int) -> Variant:
 	if _acao("usar_descarte_para_mais_2") == true:
 		return _acao("descartar_da_mao")
 	return null

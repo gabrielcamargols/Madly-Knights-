@@ -25,7 +25,7 @@ func itens_para_comprar(_partida, _jogador, _oferta: Array) -> Array:
 	return []
 
 
-func escolher_reposicao(_partida, _jogador, _reveladas: Array, pagaveis: Array):
+func escolher_reposicao(_partida, _jogador, _reveladas: Array, pagaveis: Array) -> Variant:
 	return pagaveis[0]
 
 
@@ -34,22 +34,22 @@ func ordem_de_empate(_partida, _jogador, grupo: Array) -> Array:
 
 
 ## ID do Cavaleiro em campo envolvido no Evento, ou null para o primeiro da fila.
-func escolher_cavaleiro_evento(_partida, _jogador, _evento_id: String):
+func escolher_cavaleiro_evento(_partida, _jogador, _evento_id: String) -> Variant:
 	return null
 
 
 ## ID de um Cavaleiro ou item da mão para atravessar a Ponte, ou null para rolar.
-func travessia_ponte(_partida, _jogador):
+func travessia_ponte(_partida, _jogador) -> Variant:
 	return null
 
 
 ## ID para descartar e somar +2 na Areia Movediça, ou null.
-func descarte_areia(_partida, _jogador, _cavaleiro, _face: int):
+func descarte_areia(_partida, _jogador, _cavaleiro, _face: int) -> Variant:
 	return null
 
 
 ## ID para montar a plataforma em O Chão é Lava, ou null.
-func descarte_plataforma(_partida, _jogador):
+func descarte_plataforma(_partida, _jogador) -> Variant:
 	return null
 
 
@@ -70,5 +70,5 @@ func escolher_reino(_partida, _jogador, permitidos: Array) -> String:
 	return permitidos[0]
 
 
-func descartar_por_mao_cheia(_partida, jogador):
+func descartar_por_mao_cheia(_partida, jogador) -> Variant:
 	return jogador.mao[-1]

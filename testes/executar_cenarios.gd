@@ -16,6 +16,11 @@ var verificacoes := 0
 
 
 func _initialize() -> void:
+	# Compila também os scripts que os cenários não usam, como a mesa 3D.
+	for caminho in ["res://scripts/apresentacao/principal.gd"]:
+		var script = load(caminho)
+		if script == null or not script.can_instantiate():
+			falhas.append("Script não compila: " + caminho)
 	var cat = Catalogo.new()
 	if not cat.carregar():
 		print("ERRO: não foi possível carregar os dados do jogo.")
@@ -32,7 +37,7 @@ func _initialize() -> void:
 	print("%d verificações, %d falha(s)." % [verificacoes, falhas.size()])
 	for f in falhas:
 		print("  FALHA  " + f)
-	if falhas.is_empty():
+	if falhas.is_empty() and verificacoes > 0:
 		print("TODOS OS CENÁRIOS PASSARAM")
 		quit(0)
 	else:
@@ -186,12 +191,12 @@ func _conferir_redistribuicao(contexto: String, partida, rel: Dictionary) -> voi
 	_checar(contexto, no_destino, total, "cartas nos baralhos após redistribuir")
 
 
-func _item(lista: Array, indice: int):
+func _item(lista: Array, indice: int) -> Variant:
 	return lista[indice] if indice < lista.size() else null
 
 
 ## Normaliza números do JSON (float) para comparar com inteiros.
-func _normalizar(valor):
+func _normalizar(valor) -> Variant:
 	if valor is float and valor == floorf(valor):
 		return int(valor)
 	if valor is Array:

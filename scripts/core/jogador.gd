@@ -30,7 +30,7 @@ func ids_itens() -> Array:
 	return itens_mao.map(func(i): return i["id"])
 
 
-func encontrar(id_instancia: String):
+func encontrar(id_instancia: String) -> Variant:
 	for lista in [fila, mao, cemiterio, baralho]:
 		for c in lista:
 			if c.id_instancia == id_instancia:
@@ -38,7 +38,7 @@ func encontrar(id_instancia: String):
 	return null
 
 
-func item_na_mao(id_item: String):
+func item_na_mao(id_item: String) -> Variant:
 	for item in itens_mao:
 		if item["id"] == id_item:
 			return item

@@ -10,7 +10,7 @@ var circuito: Array = []  # nomes dos reinos na ordem do circuito
 var chefe_do_reino: Dictionary = {}
 
 
-static func ler_json(caminho: String):
+static func ler_json(caminho: String) -> Variant:
 	var texto := FileAccess.get_file_as_string(caminho)
 	if texto.is_empty():
 		push_error("Não foi possível ler " + caminho)

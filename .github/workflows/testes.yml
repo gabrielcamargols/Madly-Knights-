@@ -22,11 +22,14 @@ jobs:
           chmod +x godot
           ./godot --version
 
-      - name: Importar projeto
-        run: ./godot --headless --path . --import 2>&1 | tail -20 || true
+      - name: Importar projeto e checar scripts
+        run: |
+          ./godot --headless --path . --import 2>&1 | tee importacao.txt || true
+          if grep -q "SCRIPT ERROR\|Parse Error" importacao.txt; then echo "Erro de script na importação"; exit 1; fi
 
       - name: Rodar os quatro cenários
         run: |
           set -o pipefail
           ./godot --headless --path . -s res://testes/executar_cenarios.gd 2>&1 | tee saida.txt
+          if grep -q "SCRIPT ERROR" saida.txt; then echo "Erro de script"; exit 1; fi
           grep -q "TODOS OS CENÁRIOS PASSARAM" saida.txt

@@ -91,7 +91,7 @@ func _distribuir_espadas() -> void:
 
 ## Cria o jogador. Com `ordem_instancias` o baralho fica nessa ordem (topo primeiro);
 ## sem ela, usa o baralho pessoal de teste embaralhado.
-func adicionar_jogador(id: String, ordem_instancias: Array = [], decisor = null):
+func adicionar_jogador(id: String, ordem_instancias: Array = [], decisor = null) -> Variant:
 	var j = Jogador.new(id)
 	j.moedas = int(cat.config["moedas_iniciais"])
 	j.reino_atual = cat.config["reino_inicial"]
@@ -111,7 +111,7 @@ func adicionar_jogador(id: String, ordem_instancias: Array = [], decisor = null)
 	return j
 
 
-func buscar_jogador(id: String):
+func buscar_jogador(id: String) -> Variant:
 	for j in jogadores:
 		if j.id == id:
 			return j
@@ -790,7 +790,7 @@ func _envolvido_ao_fim(p, c) -> void:
 		_mover_ao_fim(p, c)
 
 
-func _cavaleiro_escolhido(p, evento_id: String):
+func _cavaleiro_escolhido(p, evento_id: String) -> Variant:
 	var id = decisores[p.id].escolher_cavaleiro_evento(self, p, evento_id)
 	if id != null:
 		for c in p.fila:
@@ -969,7 +969,7 @@ func _repor(j) -> void:
 	ordenar_fila(j)
 
 
-func _menor_prestigio(lista: Array):
+func _menor_prestigio(lista: Array) -> Variant:
 	var melhor = null
 	for c in lista:
 		if c.custo() == 1:

@@ -18,13 +18,13 @@ const ESPACO_CARTA := 1.2
 const POS_FILA_Z := 0.75
 const POS_ENCONTRO := Vector3(0.0, 0.0, -2.0)
 const ESCALA_ENCONTRO := 1.55
-const POS_REINO := Vector3(4.3, 0.0, -1.9)
-const POS_CEMITERIO := Vector3(4.3, 0.0, 0.6)
+const POS_REINO := Vector3(-4.3, 0.0, -1.9)
+const POS_CEMITERIO := Vector3(-4.3, 0.0, 0.6)
 const POS_ENTRADA := Vector3(0.0, 0.0, 3.5)
 const MEIA_LARGURA := 0.53
 const MEIA_ALTURA := 0.73
 const TAM_MAO := Vector2(140, 196)
-const TAM_ESCOLHA := Vector2(170, 238)
+const TAM_ESCOLHA := Vector2(176, 250)
 
 var cat
 var partida
@@ -424,9 +424,12 @@ func _carta_2d(c, tamanho: Vector2, ao_tocar: Callable, estado: String = "") -> 
 	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coluna.add_child(base)
 	var forca := _rotulo_2d("F%d" % c.forca_total(), int(22 * escala), Color(0.6, 0.1, 0.05))
+	forca.autowrap_mode = TextServer.AUTOWRAP_OFF
 	forca.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	base.add_child(forca)
-	base.add_child(_rotulo_2d("A%d" % c.armadura_atual, int(22 * escala), Color(0.1, 0.25, 0.55)))
+	var armadura := _rotulo_2d("A%d" % c.armadura_atual, int(22 * escala), Color(0.1, 0.25, 0.55))
+	armadura.autowrap_mode = TextServer.AUTOWRAP_OFF
+	base.add_child(armadura)
 	if ao_tocar.is_valid():
 		painel.gui_input.connect(_ao_toque_2d.bind(ao_tocar))
 	return painel
@@ -448,7 +451,7 @@ func _carta_item_2d(item: Dictionary, tamanho: Vector2, ao_tocar: Callable, esta
 	painel.add_child(coluna)
 	coluna.add_child(_rotulo_2d(item["nome"], int(16 * escala)))
 	coluna.add_child(_rotulo_2d("%s • %s" % [item["categoria"], item["raridade"]], int(12 * escala), Color(0.25, 0.25, 0.4)))
-	coluna.add_child(_rotulo_2d(item["efeito"], int(12 * escala), Color(0.15, 0.15, 0.15)))
+	coluna.add_child(_rotulo_2d(item["efeito"], int(10.5 * escala), Color(0.15, 0.15, 0.15)))
 	var espaco := Control.new()
 	espaco.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	espaco.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -734,7 +737,7 @@ func _criar_interface() -> void:
 	mao_2d.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	mao_2d.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	mao_2d.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	mao_2d.offset_bottom = 40  # a mão sai um pouco pela borda, como nos jogos de cartas
+	mao_2d.offset_bottom = 14  # a mão encosta na borda, como nos jogos de cartas
 	mao_2d.alignment = BoxContainer.ALIGNMENT_CENTER
 	mao_2d.add_theme_constant_override("separation", -18)
 
@@ -778,7 +781,7 @@ func _criar_interface() -> void:
 	titulo_escolha = Label.new()
 	titulo_escolha.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	titulo_escolha.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	titulo_escolha.custom_minimum_size = Vector2(660, 0)
+	titulo_escolha.custom_minimum_size = Vector2(1000, 0)
 	coluna_escolha.add_child(titulo_escolha)
 	cartas_escolha = HFlowContainer.new()
 	cartas_escolha.alignment = FlowContainer.ALIGNMENT_CENTER

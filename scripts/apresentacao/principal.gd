@@ -1,11 +1,13 @@
 extends Node3D
 ## Mesa jogável do playtest no Pântano Maluco, no estilo dos jogos de cartas digitais.
 ## Só lê o estado da partida e mostra os resultados que a lógica devolveu;
-## não decide regras nem rola dados. As cartas usam visuais temporários.
+## não decide regras nem rola dados. A arte das cartas é provisória.
 ##
-## Mesa (3D): inimigo/encontro no topo, fila de Cavaleiros no meio, baralho do reino
-## e Cemitério à direita. Mão (2D) embaixo; arraste uma carta para a mesa para jogá-la.
-## Escolhas aparecem no meio da tela com as cartas grandes. Ações ficam à direita.
+## Mesa (3D, em perspectiva): o encontro no topo, as 6 vagas da sua fila embaixo dele,
+## baralho do reino e Cemitério à esquerda. As cartas da mesa são as mesmas cartas
+## desenhadas da mão, renderizadas sobre o tabuleiro.
+## Mão (2D) embaixo; arraste uma carta para a mesa para jogá-la.
+## Escolhas aparecem no centro da tela com as cartas grandes. Ações ficam à direita.
 
 const Catalogo = preload("res://scripts/core/catalogo.gd")
 const Partida = preload("res://scripts/core/partida.gd")
@@ -15,17 +17,25 @@ const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.g
 const Sessao = preload("res://scripts/apresentacao/sessao.gd")
 const Regras = preload("res://scripts/core/regras.gd")
 
-const ESPACO_CARTA := 1.2
-const POS_FILA_Z := 0.75
-const POS_ENCONTRO := Vector3(0.0, 0.0, -2.0)
-const ESCALA_ENCONTRO := 1.55
-const POS_REINO := Vector3(-4.3, 0.0, -1.9)
-const POS_CEMITERIO := Vector3(-4.3, 0.0, 0.6)
-const POS_ENTRADA := Vector3(0.0, 0.0, 3.5)
-const MEIA_LARGURA := 0.53
-const MEIA_ALTURA := 0.73
-const TAM_MAO := Vector2(140, 196)
-const TAM_ESCOLHA := Vector2(176, 250)
+# Mesa (unidades do mundo)
+const TAM_CARTA_3D := Vector2(1.1, 1.54)
+const ESPACO_VAGA := 1.3
+const VAGAS := 6
+const POS_FILA_Z := 0.35
+const POS_ENCONTRO := Vector3(0.0, 0.0, -1.85)
+const ESCALA_ENCONTRO := 1.45
+const POS_REINO := Vector3(-5.0, 0.0, -1.7)
+const POS_CEMITERIO := Vector3(-5.0, 0.0, 0.35)
+const POS_ENTRADA := Vector3(0.0, 0.0, 3.6)
+const PIXELS_CARTA := Vector2i(280, 392)  # textura de cada carta da mesa
+
+# Cartas 2D (pixels da tela-base de 1280×720)
+const TAM_MAO := Vector2(124, 174)
+const TAM_ESCOLHA := Vector2(170, 238)
+
+const COR_OURO := Color(0.98, 0.8, 0.3)
+const COR_FORCA := Color(0.78, 0.16, 0.12)
+const COR_ARMADURA := Color(0.16, 0.36, 0.78)
 
 var cat
 var partida
@@ -36,11 +46,12 @@ var indice_turno := 0
 # Modo: "iniciais", "reerguer", "preparacao", "ataque" ou "" (aguardando a lógica).
 var modo := ""
 var pendentes: Array = []  # Cavaleiros arrastados para a mesa na colocação inicial
-var decisor_atual = null  # decisor que espera uma resposta dada na mesa
+var decisor_atual = null
 var opcoes_ataque: Array = []
 var atacante_escolhido = null
 var selecionados: Array = []
-var armaduras_vistas: Dictionary = {}  # para mostrar o dano que saltou
+var armaduras_vistas: Dictionary = {}
+var carta_revelada := ""
 
 var camera: Camera3D
 var cartas_3d: Dictionary = {}  # "jogador/id_instancia" -> Node3D
@@ -56,12 +67,12 @@ var acoes: VBoxContainer
 var painel_registro: PanelContainer
 var registro: RichTextLabel
 var zona_mesa: Control
-var fundo_escolha: ColorRect
+var camada_escolha: Control
 var escolha: PanelContainer
 var titulo_escolha: Label
 var cartas_escolha: HFlowContainer
 var botoes_escolha: HFlowContainer
-var detalhes: PanelContainer
+var camada_detalhes: Control
 var texto_detalhes: RichTextLabel
 var rotulo_dado: Label
 
@@ -75,12 +86,12 @@ func _ready() -> void:
 	if not cat.carregar():
 		rotulo_dica.text = "Erro ao carregar os dados do jogo."
 		return
-	carta_encontro = _criar_carta("Pântano Maluco", Color(0.45, 0.6, 0.4))
+	carta_encontro = _criar_carta_3d()
 	carta_encontro.position = POS_ENCONTRO
 	carta_encontro.scale = Vector3(ESCALA_ENCONTRO, 1.0, ESCALA_ENCONTRO)
-	pilha_reino = _criar_carta("Reino", Color(0.3, 0.42, 0.3))
+	pilha_reino = _criar_carta_3d()
 	pilha_reino.position = POS_REINO
-	pilha_cemiterio = _criar_carta("Cemitério", Color(0.35, 0.33, 0.38))
+	pilha_cemiterio = _criar_carta_3d()
 	pilha_cemiterio.position = POS_CEMITERIO
 	nova_partida()
 
@@ -92,6 +103,7 @@ func nova_partida() -> void:
 	objetos_3d.clear()
 	armaduras_vistas.clear()
 	registro.clear()
+	carta_revelada = ""
 	_fechar_escolha()
 	partida = Partida.new(cat, Dado.new(), Embaralhador.new())
 	partida.registrou.connect(_ao_registrar)
@@ -106,10 +118,6 @@ func nova_partida() -> void:
 		partida.adicionar_jogador("j%d" % (k + 1), [], decisor)
 	indice_preparo = 0
 	indice_turno = 0
-	if carta_encontro.has_meta("carta"):
-		carta_encontro.remove_meta("carta")
-	_rotular(carta_encontro, "Pântano Maluco")
-	_colorir(carta_encontro, Color(0.45, 0.6, 0.4))
 	_preparar_proximo_jogador()
 
 
@@ -132,20 +140,44 @@ func _criar_ambiente() -> void:
 	var ambiente := WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.1, 0.12, 0.1)
+	env.background_color = Color(0.06, 0.08, 0.07)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.65, 0.65, 0.65)
+	env.ambient_light_color = Color(0.7, 0.7, 0.7)
 	ambiente.environment = env
 	add_child(ambiente)
-	var mesa := MeshInstance3D.new()
+	# Tabuleiro: madeira com um feltro verde de pântano no centro.
+	_plano(Vector2(15, 10), Vector3(0, -0.06, -0.4), Color(0.3, 0.2, 0.12))
+	_plano(Vector2(9.0, 6.4), Vector3(0.6, -0.05, -0.75), Color(0.16, 0.26, 0.18))
+	_plano(Vector2(9.0, 0.06), Vector3(0.6, -0.04, -0.62), COR_OURO.darkened(0.3))
+	# Vagas da fila.
+	for i in VAGAS:
+		var vaga := _plano(TAM_CARTA_3D * 1.06, _pos_vaga(i) + Vector3(0, 0.01, 0), Color(0.09, 0.14, 0.1))
+		vaga.name = "Vaga%d" % i
+	var marca := Label3D.new()
+	marca.text = "ataca primeiro"
+	marca.font_size = 34
+	marca.pixel_size = 0.005
+	marca.rotation_degrees.x = -90
+	marca.modulate = COR_OURO
+	marca.position = _pos_vaga(0) + Vector3(0, 0.02, 0.98)
+	add_child(marca)
+
+
+func _plano(tamanho: Vector2, posicao: Vector3, cor: Color) -> MeshInstance3D:
+	var no := MeshInstance3D.new()
 	var plano := PlaneMesh.new()
-	plano.size = Vector2(16, 11)
-	mesa.mesh = plano
+	plano.size = tamanho
+	no.mesh = plano
 	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(0.32, 0.23, 0.15)
-	mesa.material_override = material
-	mesa.position = Vector3(0, -0.04, 0)
-	add_child(mesa)
+	material.albedo_color = cor
+	no.material_override = material
+	no.position = posicao
+	add_child(no)
+	return no
+
+
+func _pos_vaga(i: int) -> Vector3:
+	return Vector3((i - (VAGAS - 1) / 2.0) * ESPACO_VAGA + 0.6, 0.0, POS_FILA_Z)
 
 
 ## Na horizontal a altura da mesa cabe na tela; na vertical, a largura.
@@ -153,64 +185,48 @@ func _ajustar_camera() -> void:
 	var tamanho := get_viewport().get_visible_rect().size
 	if tamanho.x >= tamanho.y:
 		camera.keep_aspect = Camera3D.KEEP_HEIGHT
-		camera.fov = 42
-		camera.look_at_from_position(Vector3(0, 8.4, 4.4), Vector3(0, 0, -0.35))
+		camera.fov = 44
+		camera.look_at_from_position(Vector3(0.3, 8.6, 4.6), Vector3(0.3, 0, 0.15))
 	else:
 		camera.keep_aspect = Camera3D.KEEP_WIDTH
-		camera.fov = 62
-		camera.look_at_from_position(Vector3(0, 8.8, 6.2), Vector3(0, 0, 1.2))
+		camera.fov = 72
+		camera.look_at_from_position(Vector3(0, 9.5, 6.0), Vector3(0, 0, 1.4))
 
 
-func _criar_carta(texto: String, cor: Color) -> Node3D:
+## Carta da mesa: um quadro deitado com a textura de uma carta 2D desenhada num SubViewport.
+func _criar_carta_3d() -> Node3D:
 	var raiz := Node3D.new()
+	var vp := SubViewport.new()
+	vp.name = "VP"
+	vp.size = PIXELS_CARTA
+	vp.transparent_bg = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	raiz.add_child(vp)
 	var malha := MeshInstance3D.new()
-	var caixa := BoxMesh.new()
-	caixa.size = Vector3(1.05, 0.06, 1.45)
-	malha.mesh = caixa
-	var material := StandardMaterial3D.new()
-	material.albedo_color = cor
-	malha.material_override = material
 	malha.name = "Malha"
+	var quadro := QuadMesh.new()
+	quadro.size = TAM_CARTA_3D
+	malha.mesh = quadro
+	malha.rotation_degrees.x = -90
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	material.albedo_texture = vp.get_texture()
+	malha.material_override = material
 	raiz.add_child(malha)
-	var rotulo := Label3D.new()
-	rotulo.name = "Rotulo"
-	rotulo.text = texto
-	rotulo.font_size = 40
-	rotulo.pixel_size = 0.0042
-	rotulo.width = 240
-	rotulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rotulo.rotation_degrees.x = -90
-	rotulo.position.y = 0.04
-	rotulo.modulate = Color.BLACK
-	rotulo.outline_size = 0
-	raiz.add_child(rotulo)
 	add_child(raiz)
 	return raiz
 
 
-func _rotular(carta: Node3D, texto: String) -> void:
-	(carta.get_node("Rotulo") as Label3D).text = texto
-
-
-func _colorir(carta: Node3D, cor: Color) -> void:
-	((carta.get_node("Malha") as MeshInstance3D).material_override as StandardMaterial3D).albedo_color = cor
-
-
-func _cor_do_cavaleiro(c) -> Color:
-	match c.cor:
-		"Amarelo":
-			return Color(0.96, 0.86, 0.42)
-		"Vermelho":
-			return Color(0.92, 0.5, 0.45)
-	return Color(0.8, 0.8, 0.8)
-
-
-func _nome_curto(c) -> String:
-	return c.nome.replace("Cavaleiro ", "")
-
-
-func _texto_do_cavaleiro(c) -> String:
-	return "%s\nF%d A%d/%d\nH%d P%d" % [_nome_curto(c), c.forca_total(), c.armadura_atual, c.armadura_maxima(), c.honra(), c.prestigio()]
+func _desenhar(no: Node3D, face: Control) -> void:
+	var vp: SubViewport = no.get_node("VP")
+	for filho in vp.get_children():
+		vp.remove_child(filho)
+		filho.queue_free()
+	face.custom_minimum_size = Vector2(PIXELS_CARTA)
+	face.size = Vector2(PIXELS_CARTA)
+	vp.add_child(face)
 
 
 func _chave(c) -> String:
@@ -222,22 +238,25 @@ func _atualizar(animar: bool) -> void:
 		return
 	var em_campo: Array = jogador.fila + pendentes
 	var destinos := {}
-	var n := em_campo.size()
-	for i in n:
-		var altura := 0.35 if (modo == "ataque" and em_campo[i] == atacante_escolhido) else 0.0
-		destinos[em_campo[i]] = Vector3((i - (n - 1) / 2.0) * ESPACO_CARTA, altura, POS_FILA_Z)
-	for i in jogador.cemiterio.size():
-		destinos[jogador.cemiterio[i]] = POS_CEMITERIO + Vector3(0, 0.07 * (i + 1), 0)
-	var visiveis := {}
-	for c in destinos:
-		visiveis[_chave(c)] = c
+	for i in em_campo.size():
+		var c = em_campo[i]
+		var altura := 0.35 if (modo == "ataque" and c == atacante_escolhido) else 0.0
+		destinos[c] = _pos_vaga(i) + Vector3(0, altura + 0.03, 0)
+	# Quem acabou de cair desliza para o Cemitério e some sob a pilha.
 	for chave in cartas_3d.keys():
-		if not visiveis.has(chave):
-			cartas_3d[chave].visible = false
-	for chave in visiveis:
-		var c = visiveis[chave]
+		var no: Node3D = cartas_3d[chave]
+		var c = objetos_3d.get(chave)
+		if no.visible and not destinos.has(c):
+			if animar and c != null and jogador.cemiterio.has(c):
+				var t := create_tween()
+				t.tween_property(no, "position", POS_CEMITERIO + Vector3(0, 0.1, 0), 0.45)
+				t.tween_callback(no.hide)
+			else:
+				no.visible = false
+	for c in destinos:
+		var chave := _chave(c)
 		if not cartas_3d.has(chave):
-			var nova := _criar_carta("", _cor_do_cavaleiro(c))
+			var nova := _criar_carta_3d()
 			nova.position = POS_ENTRADA
 			cartas_3d[chave] = nova
 		objetos_3d[chave] = c
@@ -245,52 +264,33 @@ func _atualizar(animar: bool) -> void:
 		if not carta.visible:
 			carta.position = POS_ENTRADA
 			carta.visible = true
-		_rotular(carta, _texto_do_cavaleiro(c))
-		var cor := _cor_do_cavaleiro(c)
+		var estado := ""
 		if modo == "ataque" and opcoes_ataque.has(c):
-			cor = cor.lightened(0.35) if c == atacante_escolhido else cor.lightened(0.15)
-		_colorir(carta, cor)
+			estado = "destaque" if c == atacante_escolhido else "opcao"
+		_desenhar(carta, _face_cavaleiro(c, Vector2(PIXELS_CARTA), estado))
 		if animar:
 			var tween := create_tween()
 			tween.tween_property(carta, "position", destinos[c], 0.4).set_trans(Tween.TRANS_CUBIC)
 		else:
 			carta.position = destinos[c]
-	_rotular(pilha_reino, "%s\n%d cartas" % [jogador.reino_atual, partida.baralhos_reino[jogador.reino_atual].size()])
-	_rotular(pilha_cemiterio, "Cemitério\n%d" % jogador.cemiterio.size())
-	pilha_cemiterio.visible = jogador.cemiterio.is_empty()
-	_atualizar_encontro()
+	_desenhar(pilha_reino, _face_verso(jogador.reino_atual, "%d cartas" % partida.baralhos_reino[jogador.reino_atual].size(), Vector2(PIXELS_CARTA)))
+	if jogador.cemiterio.is_empty():
+		_desenhar(pilha_cemiterio, _face_verso("Cemitério", "vazio", Vector2(PIXELS_CARTA), true))
+	else:
+		_desenhar(pilha_cemiterio, _face_cavaleiro(jogador.cemiterio[-1], Vector2(PIXELS_CARTA), "caido"))
+	_desenhar(carta_encontro, _face_encontro(Vector2(PIXELS_CARTA)))
 	_atualizar_mao()
 	var itens := "nenhum"
 	if not jogador.itens_mao.is_empty():
 		itens = ", ".join(jogador.itens_mao.map(func(i): return i["nome"]))
-	rotulo_status.text = "%s%s   •   Moedas: %d   •   Inimigos %d/4   •   Eventos %d/3   •   Itens: %s" % [
+	rotulo_status.text = "%s%s   •   Moedas %d   •   Inimigos %d/4   •   Eventos %d/3   •   Itens: %s" % [
 		_vez(jogador), jogador.reino_atual, jogador.moedas, jogador.inimigos, jogador.eventos, itens]
 
 
-func _atualizar_encontro() -> void:
-	var ini = partida.inimigo_atual
-	if ini != null:
-		_rotular(carta_encontro, "%s\nF%d  A%d/%d\nAmeaça %d" % [ini.nome, ini.forca_total(), ini.armadura_atual, ini.armadura_maxima, ini.ameaca])
-		var cor := Color(0.85, 0.35, 0.3) if ini.vivo() else Color(0.45, 0.4, 0.4)
-		if modo == "ataque":
-			cor = cor.lightened(0.2)
-		_colorir(carta_encontro, cor)
-
-
 func _ao_revelar(carta_id: String) -> void:
-	var tipo: String = cat.tipo_de_carta(carta_id)
-	carta_encontro.set_meta("carta", carta_id)
+	carta_revelada = carta_id
 	armaduras_vistas.clear()
-	match tipo:
-		"evento":
-			_rotular(carta_encontro, "%s\nEvento" % cat.nome_de_carta(carta_id))
-			_colorir(carta_encontro, Color(0.45, 0.6, 0.9))
-		"mercador":
-			_rotular(carta_encontro, "Mercador")
-			_colorir(carta_encontro, Color(0.95, 0.75, 0.3))
-		_:
-			_rotular(carta_encontro, cat.nome_de_carta(carta_id))
-			_colorir(carta_encontro, Color(0.85, 0.35, 0.3))
+	_desenhar(carta_encontro, _face_encontro(Vector2(PIXELS_CARTA)))
 	var tween := create_tween()
 	carta_encontro.scale = Vector3(0.2, 1, 0.2)
 	tween.tween_property(carta_encontro, "scale", Vector3(ESCALA_ENCONTRO, 1, ESCALA_ENCONTRO), 0.35).set_trans(Tween.TRANS_BACK)
@@ -323,11 +323,11 @@ func _mostrar_danos() -> void:
 func _numero_flutuante(posicao: Vector3, valor: int) -> void:
 	var r := Label3D.new()
 	r.text = ("%d" % valor) if valor < 0 else ("+%d" % valor)
-	r.font_size = 110
+	r.font_size = 120
 	r.pixel_size = 0.006
 	r.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	r.modulate = Color(1, 0.25, 0.2) if valor < 0 else Color(0.3, 1, 0.4)
-	r.outline_size = 18
+	r.outline_size = 20
 	r.no_depth_test = true
 	r.position = posicao
 	add_child(r)
@@ -359,7 +359,6 @@ func _motivo_legivel(motivo: String) -> String:
 	return motivo.replace("_", " ").capitalize()
 
 
-## Nome do Cavaleiro a partir do nome curto usado nas rolagens ("dragao" -> "Dragão").
 func _nome_por_chave(chave_curta: String) -> String:
 	for c in jogador.fila + jogador.cemiterio + jogador.mao:
 		if Regras.chave(c.id_instancia) == chave_curta:
@@ -372,103 +371,252 @@ func _ao_registrar(texto: String) -> void:
 		registro.append_text(texto + "\n")
 
 
-# --- Cartas 2D ------------------------------------------------------------------
+# --- Faces das cartas (usadas na mão, nas escolhas e na mesa) ------------------
 
-func _estilo(cor: Color, borda: Color, espessura: int = 3) -> StyleBoxFlat:
+func _cor_do_cavaleiro(c) -> Color:
+	match c.cor:
+		"Amarelo":
+			return Color(0.95, 0.78, 0.3)
+		"Vermelho":
+			return Color(0.88, 0.36, 0.3)
+	return Color(0.75, 0.75, 0.75)
+
+
+func _nome_curto(c) -> String:
+	return c.nome.replace("Cavaleiro ", "")
+
+
+func _estilo(cor: Color, borda: Color, espessura: int = 3, raio: int = 12, margem: int = 8) -> StyleBoxFlat:
 	var estilo := StyleBoxFlat.new()
 	estilo.bg_color = cor
 	estilo.border_color = borda
 	estilo.set_border_width_all(espessura)
-	estilo.set_corner_radius_all(12)
-	estilo.content_margin_left = 8
-	estilo.content_margin_right = 8
-	estilo.content_margin_top = 6
-	estilo.content_margin_bottom = 6
+	estilo.set_corner_radius_all(raio)
+	estilo.content_margin_left = margem
+	estilo.content_margin_right = margem
+	estilo.content_margin_top = margem
+	estilo.content_margin_bottom = margem
 	return estilo
 
 
-func _rotulo_2d(texto: String, tamanho: int, cor: Color = Color.BLACK) -> Label:
+func _texto(conteudo: String, tamanho: int, cor: Color = Color.WHITE, contorno: int = 0) -> Label:
 	var r := Label.new()
-	r.text = texto
+	r.text = conteudo
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.add_theme_color_override("font_color", cor)
-	r.add_theme_font_size_override("font_size", tamanho)
+	r.add_theme_font_size_override("font_size", maxi(8, tamanho))
+	if contorno > 0:
+		r.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+		r.add_theme_constant_override("outline_size", contorno)
 	return r
 
 
-## Carta de Cavaleiro em 2D. estado: "", "marcada", "destaque" ou "apagada".
-func _carta_2d(c, tamanho: Vector2, ao_tocar: Callable, estado: String = "") -> PanelContainer:
+func _ignorar_mouse(no: Control) -> Control:
+	no.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return no
+
+
+## Medalhão redondo com um número, como os atributos dos jogos de cartas.
+func _medalhao(valor: String, cor: Color, e: float, cor_texto: Color = Color.WHITE) -> PanelContainer:
+	var m := PanelContainer.new()
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var lado := 40.0 * e
+	m.custom_minimum_size = Vector2(lado, lado)
+	m.add_theme_stylebox_override("panel", _estilo(cor, Color(0.08, 0.06, 0.04), int(3 * e), 200, 0))
+	var r := _texto(valor, int(24 * e), cor_texto, int(6 * e))
+	r.autowrap_mode = TextServer.AUTOWRAP_OFF
+	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	r.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	m.add_child(r)
+	return m
+
+
+## Quadro de "arte" provisório: cor da carta e a inicial em destaque.
+func _arte(cor: Color, inicial: String, altura: float, e: float) -> PanelContainer:
+	var a := PanelContainer.new()
+	a.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	a.custom_minimum_size = Vector2(0, altura)
+	a.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var estilo := _estilo(cor, cor.darkened(0.45), int(2 * e), int(8 * e), 0)
+	estilo.bg_color = cor
+	a.add_theme_stylebox_override("panel", estilo)
+	var r := _texto(inicial, int(64 * e), cor.darkened(0.55))
+	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	r.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	a.add_child(r)
+	return a
+
+
+func _moldura(cor_fundo: Color, borda: Color, tamanho: Vector2, espessura: int) -> PanelContainer:
+	var e := tamanho.x / 140.0
 	var painel := PanelContainer.new()
 	painel.custom_minimum_size = tamanho
 	painel.pivot_offset = tamanho / 2
-	var borda := Color(0.12, 0.1, 0.08)
-	if estado == "marcada":
-		borda = Color(0.95, 0.25, 0.2)
-	elif estado == "destaque":
-		borda = Color(0.35, 1.0, 0.45)
-	painel.add_theme_stylebox_override("panel", _estilo(_cor_do_cavaleiro(c), borda, 5 if estado != "" else 3))
-	if estado == "apagada":
-		painel.modulate = Color(0.55, 0.55, 0.55)
-	var escala := tamanho.x / 140.0
-	var coluna := VBoxContainer.new()
-	coluna.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	painel.add_child(coluna)
-	var topo := HBoxContainer.new()
-	topo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coluna.add_child(topo)
-	var custo := _rotulo_2d(str(c.custo()), int(22 * escala), Color(0.2, 0.25, 0.7))
-	custo.autowrap_mode = TextServer.AUTOWRAP_OFF
-	topo.add_child(custo)
-	var nome := _rotulo_2d(_nome_curto(c), int(17 * escala))
-	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	topo.add_child(nome)
-	if c.habilidade != "":
-		coluna.add_child(_rotulo_2d(c.habilidade, int(13 * escala), Color(0.25, 0.2, 0.15)))
-	var espaco := Control.new()
-	espaco.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	espaco.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coluna.add_child(espaco)
-	coluna.add_child(_rotulo_2d("Honra %d" % c.honra(), int(14 * escala), Color(0.2, 0.2, 0.2)))
-	var base := HBoxContainer.new()
-	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coluna.add_child(base)
-	var forca := _rotulo_2d("F%d" % c.forca_total(), int(22 * escala), Color(0.6, 0.1, 0.05))
-	forca.autowrap_mode = TextServer.AUTOWRAP_OFF
-	forca.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	base.add_child(forca)
-	var armadura := _rotulo_2d("A%d" % c.armadura_atual, int(22 * escala), Color(0.1, 0.25, 0.55))
-	armadura.autowrap_mode = TextServer.AUTOWRAP_OFF
-	base.add_child(armadura)
-	if ao_tocar.is_valid():
-		painel.gui_input.connect(_ao_toque_2d.bind(ao_tocar))
+	painel.add_theme_stylebox_override("panel", _estilo(cor_fundo, borda, espessura, int(14 * e), int(6 * e)))
 	return painel
 
 
-func _carta_item_2d(item: Dictionary, tamanho: Vector2, ao_tocar: Callable, estado: String = "") -> PanelContainer:
-	var painel := PanelContainer.new()
-	painel.custom_minimum_size = tamanho
-	painel.pivot_offset = tamanho / 2
-	var borda := Color(0.3, 0.35, 0.6)
-	if estado == "marcada":
-		borda = Color(0.35, 1.0, 0.45)
-	painel.add_theme_stylebox_override("panel", _estilo(Color(0.78, 0.82, 0.96), borda, 5 if estado != "" else 3))
+## Cavaleiro. estado: "", "marcada", "destaque", "opcao", "apagada" ou "caido".
+func _face_cavaleiro(c, tamanho: Vector2, estado: String = "") -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var cor := _cor_do_cavaleiro(c)
+	var borda := Color(0.55, 0.45, 0.25)
+	var espessura := int(4 * e)
+	match estado:
+		"marcada":
+			borda = Color(1, 0.3, 0.25)
+			espessura = int(7 * e)
+		"destaque":
+			borda = Color(0.4, 1, 0.5)
+			espessura = int(8 * e)
+		"opcao":
+			borda = Color(0.4, 0.85, 1)
+			espessura = int(6 * e)
+	var painel := _moldura(Color(0.13, 0.11, 0.09), borda, tamanho, espessura)
+	if estado == "apagada" or estado == "caido":
+		painel.modulate = Color(0.5, 0.5, 0.5)
+	var coluna := _ignorar_mouse(VBoxContainer.new())
+	coluna.add_theme_constant_override("separation", int(3 * e))
+	painel.add_child(coluna)
+	var topo := _ignorar_mouse(HBoxContainer.new())
+	topo.add_theme_constant_override("separation", int(4 * e))
+	coluna.add_child(topo)
+	topo.add_child(_medalhao(str(c.custo()), Color(0.2, 0.42, 0.85), e * 0.8))
+	var nome := _texto(_nome_curto(c), int(16 * e), Color.WHITE, int(4 * e))
+	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nome.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	topo.add_child(nome)
+	coluna.add_child(_arte(cor, _nome_curto(c).left(1), 52 * e, e))
+	if c.habilidade != "":
+		var hab := _texto(c.habilidade, int(12 * e), Color(0.95, 0.88, 0.7))
+		hab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		coluna.add_child(hab)
+	var base := _ignorar_mouse(HBoxContainer.new())
+	coluna.add_child(base)
+	base.add_child(_medalhao(str(c.forca_total()), COR_FORCA, e))
+	var honra := _texto("Honra %d" % c.honra(), int(12 * e), Color(0.85, 0.85, 0.85))
+	honra.autowrap_mode = TextServer.AUTOWRAP_OFF
+	honra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	honra.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	honra.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	base.add_child(honra)
+	var ferido: bool = c.armadura_atual < c.armadura_maxima()
+	base.add_child(_medalhao(str(c.armadura_atual), COR_ARMADURA, e, Color(1, 0.55, 0.5) if ferido else Color.WHITE))
+	return painel
+
+
+func _face_item(item: Dictionary, tamanho: Vector2, estado: String = "") -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var borda := Color(0.4, 1, 0.5) if estado == "marcada" else Color(0.45, 0.5, 0.75)
+	var painel := _moldura(Color(0.12, 0.13, 0.2), borda, tamanho, int((7 if estado == "marcada" else 4) * e))
 	if estado == "apagada":
-		painel.modulate = Color(0.55, 0.55, 0.55)
-	var escala := tamanho.x / 140.0
+		painel.modulate = Color(0.5, 0.5, 0.5)
+	var coluna := _ignorar_mouse(VBoxContainer.new())
+	coluna.add_theme_constant_override("separation", int(3 * e))
+	painel.add_child(coluna)
+	var topo := _ignorar_mouse(HBoxContainer.new())
+	coluna.add_child(topo)
+	topo.add_child(_medalhao(str(int(item["preco_mercador"])), COR_OURO.darkened(0.15), e * 0.8, Color.BLACK))
+	var nome := _texto(item["nome"], int(14 * e), Color.WHITE, int(4 * e))
+	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	topo.add_child(nome)
+	coluna.add_child(_texto("%s • %s" % [item["categoria"], item["raridade"]], int(11 * e), Color(0.7, 0.75, 1)))
+	coluna.add_child(_texto(item["efeito"], int(10.5 * e), Color(0.92, 0.92, 0.92)))
+	return painel
+
+
+## Carta do topo: inimigo (com barra de Armadura), Evento, Mercador ou o próprio reino.
+func _face_encontro(tamanho: Vector2) -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var ini = partida.inimigo_atual if partida != null else null
+	if ini != null and carta_revelada == ini.id:
+		var painel := _moldura(Color(0.16, 0.06, 0.05), Color(0.85, 0.25, 0.18) if ini.vivo() else Color(0.35, 0.3, 0.3), tamanho, int(5 * e))
+		if not ini.vivo():
+			painel.modulate = Color(0.55, 0.55, 0.55)
+		var coluna := _ignorar_mouse(VBoxContainer.new())
+		coluna.add_theme_constant_override("separation", int(3 * e))
+		painel.add_child(coluna)
+		var topo := _ignorar_mouse(HBoxContainer.new())
+		coluna.add_child(topo)
+		topo.add_child(_medalhao(str(ini.ameaca), COR_OURO, e * 0.8, Color.BLACK))
+		var nome := _texto(ini.nome, int(15 * e), Color.WHITE, int(4 * e))
+		nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		topo.add_child(nome)
+		coluna.add_child(_arte(Color(0.55, 0.2, 0.15), ini.nome.left(1), 62 * e, e))
+		var barra := ProgressBar.new()
+		barra.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		barra.max_value = ini.armadura_maxima
+		barra.value = ini.armadura_atual
+		barra.show_percentage = false
+		barra.custom_minimum_size = Vector2(0, 12 * e)
+		barra.add_theme_stylebox_override("background", _estilo(Color(0.08, 0.05, 0.05), Color.BLACK, 1, int(5 * e), 0))
+		barra.add_theme_stylebox_override("fill", _estilo(Color(0.85, 0.18, 0.15), Color(0.85, 0.18, 0.15), 0, int(5 * e), 0))
+		coluna.add_child(barra)
+		var base := _ignorar_mouse(HBoxContainer.new())
+		coluna.add_child(base)
+		base.add_child(_medalhao(str(ini.forca_total()), COR_FORCA, e))
+		var vida := _texto("%d/%d" % [ini.armadura_atual, ini.armadura_maxima], int(13 * e), Color(0.9, 0.9, 0.9))
+		vida.autowrap_mode = TextServer.AUTOWRAP_OFF
+		vida.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		vida.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		vida.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		base.add_child(vida)
+		base.add_child(_medalhao(str(ini.armadura_atual), COR_ARMADURA, e))
+		return painel
+	var tipo: String = cat.tipo_de_carta(carta_revelada) if carta_revelada != "" else ""
+	if tipo == "evento":
+		var ev: Dictionary = cat.eventos[carta_revelada]
+		return _face_texto(ev["nome"], "EVENTO", ev["efeito"], Color(0.12, 0.18, 0.32), Color(0.45, 0.65, 1), tamanho)
+	if tipo == "mercador":
+		return _face_texto("Mercador", "LOJA", "Revela cinco itens. Compre quantos quiser pelos preços impressos.", Color(0.25, 0.18, 0.06), COR_OURO, tamanho)
+	var reino: String = jogador.reino_atual if jogador != null else "Pântano Maluco"
+	return _face_texto(reino, "REINO", "Explore para revelar a próxima carta.", Color(0.1, 0.2, 0.13), Color(0.45, 0.75, 0.45), tamanho)
+
+
+func _face_texto(titulo: String, selo: String, corpo: String, fundo: Color, borda: Color, tamanho: Vector2) -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var painel := _moldura(fundo, borda, tamanho, int(5 * e))
+	var coluna := _ignorar_mouse(VBoxContainer.new())
+	coluna.add_theme_constant_override("separation", int(4 * e))
+	painel.add_child(coluna)
+	var nome := _texto(titulo, int(15 * e), Color.WHITE, int(4 * e))
+	nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(nome)
+	var marca := _texto(selo, int(12 * e), borda)
+	marca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(marca)
+	var texto := _texto(corpo, int(11 * e), Color(0.9, 0.9, 0.9))
+	texto.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	coluna.add_child(texto)
+	return painel
+
+
+## Verso de baralho ou pilha.
+func _face_verso(titulo: String, subtitulo: String, tamanho: Vector2, apagado: bool = false) -> PanelContainer:
+	var e := tamanho.x / 140.0
+	var fundo := Color(0.2, 0.18, 0.22) if apagado else Color(0.28, 0.14, 0.1)
+	var painel := _moldura(fundo, COR_OURO.darkened(0.25), tamanho, int(5 * e))
 	var coluna := VBoxContainer.new()
 	coluna.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coluna.alignment = BoxContainer.ALIGNMENT_CENTER
 	painel.add_child(coluna)
-	coluna.add_child(_rotulo_2d(item["nome"], int(16 * escala)))
-	coluna.add_child(_rotulo_2d("%s • %s" % [item["categoria"], item["raridade"]], int(12 * escala), Color(0.25, 0.25, 0.4)))
-	coluna.add_child(_rotulo_2d(item["efeito"], int(10.5 * escala), Color(0.15, 0.15, 0.15)))
-	var espaco := Control.new()
-	espaco.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	espaco.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coluna.add_child(espaco)
-	coluna.add_child(_rotulo_2d("%d moedas" % int(item["preco_mercador"]), int(16 * escala), Color(0.5, 0.35, 0.0)))
-	if ao_tocar.is_valid():
-		painel.gui_input.connect(_ao_toque_2d.bind(ao_tocar))
+	var marca := _texto("MK", int(48 * e), COR_OURO.darkened(0.1 if not apagado else 0.5), int(6 * e))
+	marca.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(marca)
+	var nome := _texto(titulo, int(15 * e), Color.WHITE, int(4 * e))
+	nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(nome)
+	var sub := _texto(subtitulo, int(13 * e), Color(0.85, 0.8, 0.7))
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coluna.add_child(sub)
+	return painel
+
+
+## Liga um toque (soltar o dedo) a uma ação.
+func _tocavel(painel: Control, acao: Callable) -> Control:
+	if acao.is_valid():
+		painel.gui_input.connect(_ao_toque_2d.bind(acao))
 	return painel
 
 
@@ -490,14 +638,16 @@ func _atualizar_mao() -> void:
 		var estado := "destaque" if _pode_jogar(c) else ""
 		if modo == "preparacao" and not _pode_jogar(c):
 			estado = "apagada"
-		var carta := _carta_2d(c, TAM_MAO, _mostrar_detalhes_cavaleiro.bind(c, "Na mão"), estado)
-		carta.rotation_degrees = (i - (total - 1) / 2.0) * 3.5
+		var carta := _face_cavaleiro(c, TAM_MAO, estado)
+		_tocavel(carta, _mostrar_detalhes_cavaleiro.bind(c, "Na mão"))
+		carta.rotation_degrees = (i - (total - 1) / 2.0) * 4.0
 		carta.set_drag_forwarding(_arrastar_da_mao.bind(c), Callable(), Callable())
 		mao_2d.add_child(carta)
 		i += 1
 	for item in jogador.itens_mao:
-		var carta := _carta_item_2d(item, TAM_MAO, _tocar_item.bind(item))
-		carta.rotation_degrees = (i - (total - 1) / 2.0) * 3.5
+		var carta := _face_item(item, TAM_MAO)
+		_tocavel(carta, _tocar_item.bind(item))
+		carta.rotation_degrees = (i - (total - 1) / 2.0) * 4.0
 		mao_2d.add_child(carta)
 		i += 1
 
@@ -512,7 +662,7 @@ func _tocar_item(item: Dictionary) -> void:
 func _arrastar_da_mao(_posicao: Vector2, c) -> Variant:
 	if not _pode_jogar(c):
 		return null
-	var previa := _carta_2d(c, TAM_MAO, Callable(), "destaque")
+	var previa := _face_cavaleiro(c, TAM_MAO, "destaque")
 	previa.modulate.a = 0.9
 	var suporte := Control.new()
 	suporte.add_child(previa)
@@ -526,7 +676,7 @@ func _pode_jogar(c) -> bool:
 		"iniciais", "reerguer":
 			return pendentes.size() < 3 and not pendentes.has(c)
 		"preparacao":
-			return jogador.fila.size() < 6 and jogador.moedas >= c.custo()
+			return jogador.fila.size() < VAGAS and jogador.moedas >= c.custo()
 	return false
 
 
@@ -575,7 +725,7 @@ func _notification(qual: int) -> void:
 # --- Toques na mesa ------------------------------------------------------------
 
 func _unhandled_input(evento: InputEvent) -> void:
-	if detalhes.visible or escolha.visible or jogador == null:
+	if camada_detalhes.visible or camada_escolha.visible or jogador == null:
 		return
 	if not (evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and not evento.pressed):
 		return
@@ -610,14 +760,12 @@ func _unhandled_input(evento: InputEvent) -> void:
 			var onde := "Na mesa"
 			if jogador.fila.has(c):
 				onde = "Em campo, posição %d da fila" % (jogador.fila.find(c) + 1)
-			elif jogador.cemiterio.has(c):
-				onde = "No Cemitério"
 			_mostrar_detalhes_cavaleiro(c, onde)
 			return
 
 
 func _sob(ponto: Vector3, no: Node3D, escala: float) -> bool:
-	return absf(ponto.x - no.position.x) < MEIA_LARGURA * escala and absf(ponto.z - no.position.z) < MEIA_ALTURA * escala
+	return absf(ponto.x - no.position.x) < TAM_CARTA_3D.x / 2 * escala and absf(ponto.z - no.position.z) < TAM_CARTA_3D.y / 2 * escala
 
 
 ## Ataca o inimigo com o Cavaleiro escolhido (toque no inimigo durante o combate).
@@ -653,30 +801,29 @@ func _mostrar_detalhes_cavaleiro(c, onde: String) -> void:
 
 
 func _detalhes_do_encontro() -> String:
-	if not carta_encontro.has_meta("carta"):
+	if carta_revelada == "":
 		return "[b]%s[/b]\n\nExplore o reino para revelar a primeira carta." % jogador.reino_atual
-	var id: String = carta_encontro.get_meta("carta")
-	var tipo: String = cat.tipo_de_carta(id)
+	var tipo: String = cat.tipo_de_carta(carta_revelada)
 	if tipo == "mercador":
 		return "[b]Mercador[/b]\n\nRevela cinco itens. Compre quantos quiser pelos preços impressos."
 	if tipo == "evento":
-		var ev: Dictionary = cat.eventos[id]
+		var ev: Dictionary = cat.eventos[carta_revelada]
 		return "[b]%s[/b]  (Evento)\n\n%s" % [ev["nome"], ev["efeito"]]
-	var dados: Dictionary = cat.inimigos[id]
+	var dados: Dictionary = cat.inimigos[carta_revelada]
 	var ini = partida.inimigo_atual
 	var estado := ""
-	if ini != null and ini.id == id:
+	if ini != null and ini.id == carta_revelada:
 		estado = "\nForça %d   Armadura %d/%d   Ameaça %d%s" % [ini.forca_total(), ini.armadura_atual, ini.armadura_maxima, ini.ameaca, "" if ini.vivo() else "   (derrotado)"]
 	return "[b]%s[/b]  (%s)%s\n\n[b]%s[/b]: %s" % [dados["nome"], dados["tipo"], estado, dados["habilidade"], dados["efeito"]]
 
 
 func _mostrar_detalhes(texto: String) -> void:
 	texto_detalhes.text = texto
-	detalhes.visible = true
+	camada_detalhes.visible = true
 
 
 func _fechar_detalhes() -> void:
-	detalhes.visible = false
+	camada_detalhes.visible = false
 
 
 func _alternar_registro() -> void:
@@ -707,16 +854,17 @@ func _criar_interface() -> void:
 	var topo := PanelContainer.new()
 	raiz.add_child(topo)
 	topo.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	topo.add_theme_stylebox_override("panel", _estilo(Color(0.05, 0.05, 0.05, 0.75), Color(0, 0, 0, 0), 0, 0, 4))
 	var linha_topo := HBoxContainer.new()
 	topo.add_child(linha_topo)
 	var menu := Button.new()
 	menu.text = "Menu"
-	menu.custom_minimum_size = Vector2(96, 48)
+	menu.custom_minimum_size = Vector2(96, 44)
 	menu.pressed.connect(_ir_ao_menu)
 	linha_topo.add_child(menu)
 	var botao_registro := Button.new()
 	botao_registro.text = "Registro"
-	botao_registro.custom_minimum_size = Vector2(120, 48)
+	botao_registro.custom_minimum_size = Vector2(120, 44)
 	botao_registro.pressed.connect(_alternar_registro)
 	linha_topo.add_child(botao_registro)
 	rotulo_status = Label.new()
@@ -731,25 +879,25 @@ func _criar_interface() -> void:
 	rotulo_dica = Label.new()
 	raiz.add_child(rotulo_dica)
 	rotulo_dica.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	rotulo_dica.offset_top = 58
-	rotulo_dica.offset_bottom = 120
+	rotulo_dica.offset_top = 54
+	rotulo_dica.offset_bottom = 110
 	rotulo_dica.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rotulo_dica.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rotulo_dica.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rotulo_dica.add_theme_color_override("font_color", Color(1, 0.92, 0.6))
 	rotulo_dica.add_theme_color_override("font_outline_color", Color.BLACK)
 	rotulo_dica.add_theme_constant_override("outline_size", 8)
-	rotulo_dica.add_theme_font_size_override("font_size", 24)
+	rotulo_dica.add_theme_font_size_override("font_size", 23)
 
-	# Mão: embaixo, no centro.
+	# Mão: embaixo, no centro, saindo um pouco pela borda como nos jogos de cartas.
 	mao_2d = HBoxContainer.new()
 	raiz.add_child(mao_2d)
 	mao_2d.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	mao_2d.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	mao_2d.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	mao_2d.offset_bottom = -8
+	mao_2d.offset_bottom = 30
 	mao_2d.alignment = BoxContainer.ALIGNMENT_CENTER
-	mao_2d.add_theme_constant_override("separation", -18)
+	mao_2d.add_theme_constant_override("separation", -14)
 
 	# Ações: à direita, como o botão de fim de turno.
 	acoes = VBoxContainer.new()
@@ -759,13 +907,14 @@ func _criar_interface() -> void:
 	acoes.grow_vertical = Control.GROW_DIRECTION_BOTH
 	acoes.offset_right = -16
 	acoes.offset_left = -16
+	acoes.offset_top = 60
 	acoes.add_theme_constant_override("separation", 10)
 
 	# Registro: painel à esquerda, aberto pelo botão do topo.
 	painel_registro = PanelContainer.new()
 	raiz.add_child(painel_registro)
 	painel_registro.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
-	painel_registro.offset_top = 60
+	painel_registro.offset_top = 56
 	painel_registro.offset_bottom = -10
 	painel_registro.custom_minimum_size = Vector2(420, 0)
 	registro = RichTextLabel.new()
@@ -774,24 +923,19 @@ func _criar_interface() -> void:
 	painel_registro.add_child(registro)
 	painel_registro.visible = false
 
-	# Escolhas: no meio da tela, com o fundo escurecido.
-	fundo_escolha = ColorRect.new()
-	raiz.add_child(fundo_escolha)
-	fundo_escolha.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	fundo_escolha.color = Color(0, 0, 0, 0.55)
+	# Escolhas: no centro da tela, com o fundo escurecido. O CenterContainer mantém
+	# a janela centralizada qualquer que seja o tamanho do conteúdo.
+	camada_escolha = _camada_central(raiz)
 	escolha = PanelContainer.new()
-	raiz.add_child(escolha)
-	escolha.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	escolha.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	escolha.grow_vertical = Control.GROW_DIRECTION_BOTH
-	escolha.add_theme_stylebox_override("panel", _estilo(Color(0.13, 0.12, 0.1, 0.96), Color(0.98, 0.82, 0.3)))
+	escolha.add_theme_stylebox_override("panel", _estilo(Color(0.1, 0.09, 0.08, 0.97), COR_OURO, 3, 16, 18))
+	camada_escolha.get_child(1).add_child(escolha)
 	var coluna_escolha := VBoxContainer.new()
 	coluna_escolha.add_theme_constant_override("separation", 14)
 	escolha.add_child(coluna_escolha)
 	titulo_escolha = Label.new()
 	titulo_escolha.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	titulo_escolha.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	titulo_escolha.custom_minimum_size = Vector2(1000, 0)
+	titulo_escolha.custom_minimum_size = Vector2(980, 0)
 	coluna_escolha.add_child(titulo_escolha)
 	cartas_escolha = HFlowContainer.new()
 	cartas_escolha.alignment = FlowContainer.ALIGNMENT_CENTER
@@ -808,41 +952,53 @@ func _criar_interface() -> void:
 	rotulo_dado = Label.new()
 	raiz.add_child(rotulo_dado)
 	rotulo_dado.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	rotulo_dado.custom_minimum_size = Vector2(520, 120)
-	rotulo_dado.offset_left = -260
-	rotulo_dado.offset_right = 260
-	rotulo_dado.offset_top = -170
-	rotulo_dado.offset_bottom = -50
+	rotulo_dado.offset_left = -300
+	rotulo_dado.offset_right = 300
+	rotulo_dado.offset_top = -120
+	rotulo_dado.offset_bottom = 0
 	rotulo_dado.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rotulo_dado.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	rotulo_dado.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rotulo_dado.add_theme_font_size_override("font_size", 44)
 	rotulo_dado.add_theme_color_override("font_color", Color(1, 1, 1))
 	rotulo_dado.add_theme_color_override("font_outline_color", Color(0.1, 0.05, 0))
 	rotulo_dado.add_theme_constant_override("outline_size", 14)
-	rotulo_dado.pivot_offset = Vector2(260, 60)
+	rotulo_dado.pivot_offset = Vector2(300, 60)
 	rotulo_dado.visible = false
 
-	# Detalhes de uma carta.
-	detalhes = PanelContainer.new()
-	raiz.add_child(detalhes)
-	detalhes.custom_minimum_size = Vector2(620, 0)
-	detalhes.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	detalhes.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	detalhes.grow_vertical = Control.GROW_DIRECTION_BOTH
-	detalhes.add_theme_stylebox_override("panel", _estilo(Color(0.12, 0.12, 0.14, 0.97), Color(0.98, 0.82, 0.3)))
+	# Detalhes de uma carta, também centralizados.
+	camada_detalhes = _camada_central(raiz)
+	var detalhes := PanelContainer.new()
+	detalhes.add_theme_stylebox_override("panel", _estilo(Color(0.1, 0.1, 0.12, 0.97), COR_OURO, 3, 16, 18))
+	camada_detalhes.get_child(1).add_child(detalhes)
 	var coluna_detalhes := VBoxContainer.new()
 	detalhes.add_child(coluna_detalhes)
 	texto_detalhes = RichTextLabel.new()
 	texto_detalhes.bbcode_enabled = true
 	texto_detalhes.fit_content = true
-	texto_detalhes.custom_minimum_size = Vector2(600, 0)
+	texto_detalhes.custom_minimum_size = Vector2(620, 0)
 	coluna_detalhes.add_child(texto_detalhes)
 	var fechar := Button.new()
 	fechar.text = "Fechar"
 	fechar.custom_minimum_size = Vector2(0, 54)
 	fechar.pressed.connect(_fechar_detalhes)
 	coluna_detalhes.add_child(fechar)
-	detalhes.visible = false
+	camada_detalhes.visible = false
+
+
+## Camada de tela cheia com fundo escuro e um CenterContainer para o conteúdo.
+func _camada_central(raiz: Control) -> Control:
+	var camada := Control.new()
+	raiz.add_child(camada)
+	camada.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var fundo := ColorRect.new()
+	fundo.color = Color(0, 0, 0, 0.6)
+	camada.add_child(fundo)
+	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var centro := CenterContainer.new()
+	camada.add_child(centro)
+	centro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	return camada
 
 
 func _ir_ao_menu() -> void:
@@ -857,14 +1013,11 @@ func _abrir_escolha(titulo: String) -> void:
 		for filho in recipiente.get_children():
 			recipiente.remove_child(filho)
 			filho.queue_free()
-	fundo_escolha.visible = true
-	escolha.visible = true
-	escolha.reset_size()
+	camada_escolha.visible = true
 
 
 func _fechar_escolha() -> void:
-	fundo_escolha.visible = false
-	escolha.visible = false
+	camada_escolha.visible = false
 
 
 func _botao_escolha(texto: String, acao: Callable, ativo: bool = true) -> void:
@@ -874,6 +1027,10 @@ func _botao_escolha(texto: String, acao: Callable, ativo: bool = true) -> void:
 	b.custom_minimum_size = Vector2(180, 60)
 	b.pressed.connect(acao)
 	botoes_escolha.add_child(b)
+
+
+func _carta_na_escolha(face: Control, acao: Callable) -> void:
+	cartas_escolha.add_child(_tocavel(face, acao))
 
 
 ## Responde ao decisor e fecha a janela de escolha.
@@ -895,10 +1052,9 @@ func _acao(texto: String, acao: Callable, ativo: bool = true, principal: bool = 
 	b.custom_minimum_size = Vector2(230, 84 if principal else 58)
 	if principal:
 		b.add_theme_font_size_override("font_size", 26)
-		b.add_theme_stylebox_override("normal", _estilo(Color(0.85, 0.62, 0.15), Color(1, 0.9, 0.5)))
-		b.add_theme_stylebox_override("hover", _estilo(Color(0.95, 0.7, 0.2), Color(1, 0.95, 0.6)))
-		b.add_theme_color_override("font_color", Color.BLACK)
-		b.add_theme_color_override("font_hover_color", Color.BLACK)
+		b.add_theme_stylebox_override("normal", _estilo(Color(0.2, 0.5, 0.25), Color(0.6, 1, 0.6)))
+		b.add_theme_stylebox_override("hover", _estilo(Color(0.25, 0.6, 0.3), Color(0.7, 1, 0.7)))
+		b.add_theme_stylebox_override("pressed", _estilo(Color(0.15, 0.4, 0.2), Color(0.6, 1, 0.6)))
 	b.pressed.connect(acao)
 	acoes.add_child(b)
 
@@ -935,8 +1091,7 @@ func _tela_mulligan() -> void:
 	_atualizar(false)
 	_abrir_escolha("%sSua mão inicial. Toque nas cartas que quer trocar (mulligan). Pode repetir quantas vezes quiser." % _vez(jogador))
 	for c in jogador.mao:
-		var estado := "marcada" if selecionados.has(c) else ""
-		cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, _alternar_mulligan.bind(c), estado))
+		_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA, "marcada" if selecionados.has(c) else ""), _alternar_mulligan.bind(c))
 	_botao_escolha("Trocar %d marcada%s" % [selecionados.size(), "" if selecionados.size() == 1 else "s"], _trocar_marcadas, not selecionados.is_empty())
 	_botao_escolha("Manter mão", _tela_iniciais)
 
@@ -966,7 +1121,7 @@ func _tela_iniciais() -> void:
 func _dica_iniciais() -> void:
 	var faltam := mini(3, jogador.mao.size()) - pendentes.size()
 	var inicio := "Derrota total! " if modo == "reerguer" else ""
-	rotulo_dica.text = "%s%sArraste %d Cavaleiro%s da mão para a mesa. Entram de graça." % [_vez(jogador), inicio, faltam, "" if faltam == 1 else "s"]
+	rotulo_dica.text = "%s%sArraste %d Cavaleiro%s da mão para as vagas da mesa. Entram de graça." % [_vez(jogador), inicio, faltam, "" if faltam == 1 else "s"]
 
 
 func _concluir_iniciais(escolhidos: Array) -> void:
@@ -1033,7 +1188,7 @@ func _comprar_as_cegas() -> void:
 func _escolher_portador(item: Dictionary) -> void:
 	_abrir_escolha("Quem vai equipar %s?\n%s: %s" % [item["nome"], item["categoria"], item["efeito"]])
 	for c in jogador.fila + jogador.mao:
-		cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, _equipar.bind(c, item)))
+		_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA), _equipar.bind(c, item))
 	_botao_escolha("Cancelar", _fechar_escolha)
 
 
@@ -1122,19 +1277,19 @@ func _ao_pedido(tipo: String, dados: Dictionary, decisor) -> void:
 			for c in dados["reveladas"]:
 				var pode: bool = dados["pagaveis"].has(c)
 				var acao: Callable = _responder.bind(decisor, c) if pode else Callable()
-				cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, acao, "" if pode else "apagada"))
+				_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA, "" if pode else "apagada"), acao)
 		"cavaleiro_evento":
 			var ev: Dictionary = cat.eventos[dados["evento"]]
 			_abrir_escolha("%s%s\n%s\n\nEscolha o Cavaleiro." % [vez, ev["nome"], ev["efeito"]])
 			for c in quem.fila:
-				cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, _responder.bind(decisor, c.id_instancia)))
+				_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA), _responder.bind(decisor, c.id_instancia))
 		"descarte":
 			var ev: Dictionary = cat.eventos[dados["evento"]]
 			_abrir_escolha(vez + dados.get("texto", "%s\n%s\n\nToque numa carta da mão para descartá-la." % [ev["nome"], ev["efeito"]]))
 			for c in quem.mao:
-				cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, _responder.bind(decisor, c.id_instancia)))
+				_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA), _responder.bind(decisor, c.id_instancia))
 			for item in quem.itens_mao:
-				cartas_escolha.add_child(_carta_item_2d(item, TAM_ESCOLHA, _responder.bind(decisor, item["id"])))
+				_carta_na_escolha(_face_item(item, TAM_ESCOLHA), _responder.bind(decisor, item["id"]))
 			_botao_escolha(dados["recusa"], _responder.bind(decisor, null))
 		"empate":
 			_tela_empate(decisor, quem, dados["grupo"], [])
@@ -1168,7 +1323,7 @@ func _tela_empate(decisor, quem, grupo: Array, escolhidos: Array) -> void:
 	_abrir_escolha(texto)
 	for c in grupo:
 		if not escolhidos.has(c):
-			cartas_escolha.add_child(_carta_2d(c, TAM_ESCOLHA, _tela_empate.bind(decisor, quem, grupo, escolhidos + [c])))
+			_carta_na_escolha(_face_cavaleiro(c, TAM_ESCOLHA), _tela_empate.bind(decisor, quem, grupo, escolhidos + [c]))
 	if escolhidos.is_empty():
 		_botao_escolha("Manter ordem atual", _responder.bind(decisor, grupo))
 
@@ -1179,7 +1334,7 @@ func _tela_mercador(decisor, quem, oferta: Array) -> void:
 		total += int(item["preco_mercador"])
 	_abrir_escolha("%sMercador! Toque nos itens que quer comprar. Você tem %d moedas." % [_vez(quem), quem.moedas])
 	for item in oferta:
-		cartas_escolha.add_child(_carta_item_2d(item, TAM_ESCOLHA, _alternar_item.bind(decisor, quem, oferta, item), "marcada" if selecionados.has(item) else ""))
+		_carta_na_escolha(_face_item(item, TAM_ESCOLHA, "marcada" if selecionados.has(item) else ""), _alternar_item.bind(decisor, quem, oferta, item))
 	_botao_escolha("Comprar (%d moedas)" % total, _confirmar_mercador.bind(decisor), not selecionados.is_empty() and total <= quem.moedas)
 	_botao_escolha("Não comprar nada", _responder.bind(decisor, []))
 

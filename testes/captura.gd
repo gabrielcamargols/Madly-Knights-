@@ -30,7 +30,7 @@ func _initialize() -> void:
 			_salvar("3_colocando_iniciais")
 	await _esperar(0.8)
 	for tentativa in 4:
-		if cena.escolha.visible:
+		if cena.camada_escolha.visible:
 			_salvar("4_empate_de_honra")
 			_apertar("Manter ordem atual")
 			await _esperar(0.5)
@@ -50,7 +50,7 @@ func _initialize() -> void:
 			cena.atacar()
 			await _esperar(0.25)
 			_salvar_uma_vez("7_dado_e_dano")
-		elif cena.escolha.visible:
+		elif cena.camada_escolha.visible:
 			_salvar_uma_vez("8_escolha_" + str(passo))
 			_resolver_escolha()
 		elif cena.modo == "reerguer":
@@ -59,12 +59,12 @@ func _initialize() -> void:
 				cena.jogar_em_campo(livres[0])
 	await _esperar(0.6)
 	_salvar("9_fim_do_turno")
-	if not cena.jogador.fila.is_empty() and not cena.escolha.visible:
+	if not cena.jogador.fila.is_empty() and not cena.camada_escolha.visible:
 		var no: Node3D = cena.cartas_3d[cena._chave(cena.jogador.fila[0])]
 		_clicar(cena.camera.unproject_position(no.position))
 		await _esperar(0.4)
 		_salvar("10_detalhes_da_carta")
-		print("Detalhes visíveis: %s" % cena.detalhes.visible)
+		print("Detalhes visíveis: %s" % cena.camada_detalhes.visible)
 	print("Dica final: " + cena.rotulo_dica.text)
 	quit()
 

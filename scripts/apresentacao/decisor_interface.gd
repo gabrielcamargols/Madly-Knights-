@@ -1,0 +1,71 @@
+extends "res://scripts/core/decisor.gd"
+## Decisões tomadas pela pessoa na interface. Cada pergunta emite `pedido`
+## e espera a interface chamar `responder()`.
+
+signal pedido(tipo: String, dados: Dictionary)
+signal respondido(valor)
+
+
+func responder(valor) -> void:
+	respondido.emit(valor)
+
+
+func _perguntar(tipo: String, dados: Dictionary) -> Variant:
+	pedido.emit(tipo, dados)
+	var valor = await respondido
+	return valor
+
+
+func itens_para_comprar(_partida, jogador, oferta: Array) -> Array:
+	var r = await _perguntar("mercador", {"jogador": jogador, "oferta": oferta})
+	return r if r is Array else []
+
+
+func escolher_reposicao(_partida, jogador, reveladas: Array, pagaveis: Array) -> Variant:
+	return await _perguntar("reposicao", {"jogador": jogador, "reveladas": reveladas, "pagaveis": pagaveis})
+
+
+func escolher_cavaleiro_evento(_partida, jogador, evento_id: String) -> Variant:
+	if jogador.fila.size() <= 1:
+		return null
+	return await _perguntar("cavaleiro_evento", {"jogador": jogador, "evento": evento_id})
+
+
+func travessia_ponte(_partida, jogador) -> Variant:
+	return await _perguntar("descarte", {"jogador": jogador, "evento": "ponte_despencando", "recusa": "Rolar o D6"})
+
+
+func descarte_areia(_partida, jogador, cavaleiro, face: int) -> Variant:
+	if face >= 5 or (jogador.mao.is_empty() and jogador.itens_mao.is_empty()):
+		return null
+	return await _perguntar("descarte", {
+		"jogador": jogador, "evento": "areia_movedica", "recusa": "Ficar com o resultado",
+		"texto": "%s tirou %d na Areia Movediça. Descartar uma carta da mão soma +2." % [cavaleiro.nome, face],
+	})
+
+
+func descarte_plataforma(_partida, jogador) -> Variant:
+	return await _perguntar("descarte", {"jogador": jogador, "evento": "o_chao_e_lava", "recusa": "Não descartar (sofrer 3 de dano)"})
+
+
+func usar_habilidade(_partida, _jogador, _cavaleiro, habilidade: String) -> bool:
+	# Habilidades de "uma vez por combate" que só ajudam são usadas automaticamente.
+	return habilidade in ["Passo Apressado", "Totalmente Honesto", "Previsão: Dor", "Investimento Agressivo"]
+
+
+func conversao(partida, jogador) -> String:
+	var total := 0
+	for c in jogador.fila:
+		total += c.prestigio()
+	var r = await _perguntar("conversao", {"jogador": jogador, "total": total, "reino": jogador.reino_atual})
+	return r if r is String else "moedas"
+
+
+func distribuir_status(_partida, jogador, cavaleiro) -> Dictionary:
+	var r = await _perguntar("status", {"jogador": jogador, "cavaleiro": cavaleiro})
+	return r if r is Dictionary else {"forca": cavaleiro.prestigio(), "armadura": 0, "honra": 0}
+
+
+func escolher_reino(_partida, jogador, permitidos: Array) -> String:
+	var r = await _perguntar("reino", {"jogador": jogador, "permitidos": permitidos})
+	return r if r is String else permitidos[0]

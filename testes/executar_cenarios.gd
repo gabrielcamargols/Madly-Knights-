@@ -32,7 +32,7 @@ func _initialize() -> void:
 		quit(1)
 		return
 	for cenario in dados["cenarios"]:
-		_rodar(cat, cenario)
+		await _rodar(cat, cenario)
 	print("")
 	print("%d verificações, %d falha(s)." % [verificacoes, falhas.size()])
 	for f in falhas:
@@ -88,7 +88,7 @@ func _rodar(cat, cenario: Dictionary) -> void:
 				emb.definir_topo("reposicao", a["na_reposicao"]["topo_apos_embaralhar"])
 		dado.fixar(turno["d6_em_ordem"])
 		var ativo = partida.jogadores[0]
-		var rel: Dictionary = partida.jogar_turno(ativo)
+		var rel: Dictionary = await partida.jogar_turno(ativo)
 		_checar(contexto, rel.get("revelacao", ""), turno["revelacao"], "carta revelada")
 		_conferir_reposicao(contexto, acoes, ativo)
 		_conferir_dado(contexto, dado)

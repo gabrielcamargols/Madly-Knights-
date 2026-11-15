@@ -3,6 +3,7 @@ extends RefCounted
 ## Não conhece a apresentação 3D: ela lê o estado e escuta o sinal `registrou`.
 
 signal registrou(texto: String)
+signal revelou(carta_id: String)
 
 const Regras = preload("res://scripts/core/regras.gd")
 const Cavaleiro = preload("res://scripts/core/cavaleiro.gd")
@@ -120,28 +121,41 @@ func buscar_jogador(id: String) -> Variant:
 
 ## Compra a mão inicial, faz mulligan e coloca três Cavaleiros gratuitamente.
 func preparar_inicio(j, com_mulligan: bool = true) -> void:
-	_comprar(j, Regras.TAMANHO_MAO_INICIAL)
+	comprar_mao_inicial(j)
 	if com_mulligan:
 		for tentativa in 10:
 			var devolver: Array = decisores[j.id].mulligan(self, j)
 			if devolver.is_empty():
 				break
-			for c in devolver:
-				j.mao.erase(c)
-				j.baralho.append(c)
-			j.baralho = embaralhador.embaralhar(j.baralho, "mulligan", _id_de_cavaleiro)
-			_comprar(j, devolver.size())
-	_colocar_iniciais(j)
-	registrar("%s começa com %s." % [j.id, ", ".join(j.fila.map(func(c): return c.nome))])
+			fazer_mulligan(j, devolver)
+	colocar_iniciais(j, decisores[j.id].escolher_iniciais(self, j))
 
 
-func _colocar_iniciais(j) -> void:
-	var iniciais: Array = decisores[j.id].escolher_iniciais(self, j)
+func comprar_mao_inicial(j) -> void:
+	_comprar(j, Regras.TAMANHO_MAO_INICIAL)
+
+
+## Devolve as cartas ao baralho, embaralha e compra a mesma quantidade.
+func fazer_mulligan(j, devolver: Array) -> void:
+	var quantidade := 0
+	for c in devolver:
+		if j.mao.has(c):
+			j.mao.erase(c)
+			j.baralho.append(c)
+			quantidade += 1
+	j.baralho = embaralhador.embaralhar(j.baralho, "mulligan", _id_de_cavaleiro)
+	_comprar(j, quantidade)
+	registrar("%s troca %d carta(s) no mulligan." % [j.id, quantidade])
+
+
+## Coloca até três Cavaleiros da mão em campo, sem custo, e ordena por Honra.
+func colocar_iniciais(j, iniciais: Array) -> void:
 	for c in iniciais.slice(0, Regras.RECRUTAMENTOS_GRATUITOS):
 		if j.mao.has(c):
 			j.mao.erase(c)
 			j.fila.append(c)
 	ordenar_fila(j)
+	registrar("%s começa com %s." % [j.id, ", ".join(j.fila.map(func(c): return c.nome))])
 
 
 ## Em multiplayer, o maior D6 começa. Empates rolam de novo.
@@ -292,7 +306,18 @@ func _quer(j, c, habilidade: String) -> bool:
 
 # --- Turno ----------------------------------------------------------------------
 
+## Turno completo de uma vez (testes e jogadores automáticos).
 func jogar_turno(j) -> Dictionary:
+	var encerrado: bool = await iniciar_turno(j)
+	if encerrado:
+		return relatorio
+	_preparacao(j)
+	return await explorar_e_resolver(j)
+
+
+## Abre o turno. Devolve true se o jogador avançou por uma condição já cumprida
+## no turno de outro jogador; nesse caso o turno termina sem exploração.
+func iniciar_turno(j) -> bool:
 	turno += 1
 	relatorio = {
 		"jogador": j.id, "revelacao": "", "armadura_inimigo": [], "danos_ao_inimigo": [],
@@ -302,21 +327,24 @@ func jogar_turno(j) -> Dictionary:
 	j.comprou_cavaleiro_no_turno = false
 	j.comprou_as_cegas_no_turno = false
 	registrar("— Turno %d de %s em %s —" % [turno, j.id, j.reino_atual])
-	# Condição de avanço cumprida no turno de outro jogador: avance e encerre.
-	if _verificar_avanco(j):
+	var avancou: bool = await _verificar_avanco(j)
+	if avancou:
 		_fim_do_turno(j)
-		return relatorio
-	_preparacao(j)
+	return avancou
+
+
+## Exploração, Resolução, Reposição e Avanço. As decisões do jogador podem esperar a interface.
+func explorar_e_resolver(j) -> Dictionary:
 	var carta_id := _explorar(j)
 	relatorio["revelacao"] = carta_id
-	var resultado := _resolver(j, carta_id)
+	var resultado: String = await _resolver(j, carta_id)
 	if resultado != "derrota_total":
 		relatorio["moedas_antes_reposicao"] = j.moedas
-		_repor(j)
+		await _repor(j)
 		for outro in jogadores:
 			if outro != j and outro.vagas > 0:
-				_repor(outro)
-		_verificar_avanco(j)
+				await _repor(outro)
+		await _verificar_avanco(j)
 	_fim_do_turno(j)
 	return relatorio
 
@@ -422,6 +450,7 @@ func _explorar(j) -> String:
 		registrar("O baralho de %s está vazio." % r)
 		return ""
 	var carta: String = baralhos_reino[r].pop_front()
+	revelou.emit(carta)
 	registrar("%s revela %s." % [j.id, cat.nome_de_carta(carta)])
 	return carta
 
@@ -431,10 +460,10 @@ func _resolver(j, carta_id: String) -> String:
 		return "ok"
 	match cat.tipo_de_carta(carta_id):
 		"mercador":
-			_mercador(j)
+			await _mercador(j)
 			descartes_reino[j.reino_atual].append(carta_id)
 		"evento":
-			_evento(j, carta_id)
+			await _evento(j, carta_id)
 			descartes_reino[j.reino_atual].append(carta_id)
 		"monstro", "inimigo", "chefe":
 			return _combate(j, carta_id)
@@ -456,7 +485,8 @@ func _mercador(j) -> void:
 	relatorio["oferta_mercador"] = oferta.map(_id_de_item)
 	registrar("O Mercador oferece: %s." % ", ".join(oferta.map(func(i): return i["nome"])))
 	var devolvidos := oferta.duplicate()
-	for id_item in decisores[j.id].itens_para_comprar(self, j, oferta):
+	var escolhidos: Array = await decisores[j.id].itens_para_comprar(self, j, oferta)
+	for id_item in escolhidos:
 		var item = null
 		for o in devolvidos:
 			if o["id"] == id_item:
@@ -738,7 +768,7 @@ func _derrota_total(j, ini) -> String:
 	j.reino_atual = j.reino_inicial
 	if j.mao.size() < 3:
 		_comprar(j, Regras.TAMANHO_MAO_INICIAL - j.mao.size())
-	_colocar_iniciais(j)
+	colocar_iniciais(j, decisores[j.id].escolher_iniciais(self, j))
 	return "derrota_total"
 
 
@@ -762,15 +792,15 @@ func _evento(j, id: String) -> void:
 	var participantes := _participantes(j, ev)
 	match id:
 		"ponte_despencando":
-			_ponte(participantes)
+			await _ponte(participantes)
 		"areia_movedica":
 			for p in participantes:
-				_areia(p)
+				await _areia(p)
 		"gato_de_botas":
 			for p in participantes:
-				_gato(p)
+				await _gato(p)
 		"o_chao_e_lava":
-			_chao_e_lava(participantes)
+			await _chao_e_lava(participantes)
 		"lute_por_honra":
 			_lute_por_honra(j)
 		"furacao_tubarao":
@@ -791,7 +821,7 @@ func _envolvido_ao_fim(p, c) -> void:
 
 
 func _cavaleiro_escolhido(p, evento_id: String) -> Variant:
-	var id = decisores[p.id].escolher_cavaleiro_evento(self, p, evento_id)
+	var id = await decisores[p.id].escolher_cavaleiro_evento(self, p, evento_id)
 	if id != null:
 		for c in p.fila:
 			if c.id_instancia == id:
@@ -806,7 +836,8 @@ func _ponte(participantes: Array) -> void:
 			continue
 		var envolvido = p.fila[0]
 		var atravessou := false
-		if _descartar_da_mao(p, decisores[p.id].travessia_ponte(self, p)):
+		var descarte = await decisores[p.id].travessia_ponte(self, p)
+		if _descartar_da_mao(p, descarte):
 			atravessou = true
 		else:
 			var face: int = dado.rolar("ponte_" + p.id)
@@ -825,11 +856,12 @@ func _ponte(participantes: Array) -> void:
 
 
 func _areia(p) -> void:
-	var c = _cavaleiro_escolhido(p, "areia_movedica")
+	var c = await _cavaleiro_escolhido(p, "areia_movedica")
 	if c == null:
 		return
 	var face: int = dado.rolar("areia_" + Regras.chave(c.id_instancia))
-	if _descartar_da_mao(p, decisores[p.id].descarte_areia(self, p, c, face)):
+	var descarte = await decisores[p.id].descarte_areia(self, p, c, face)
+	if _descartar_da_mao(p, descarte):
 		face = mini(6, face + 2)
 	if face <= 2:
 		p.fila.erase(c)
@@ -847,7 +879,7 @@ func _areia(p) -> void:
 
 
 func _gato(p) -> void:
-	var c = _cavaleiro_escolhido(p, "gato_de_botas")
+	var c = await _cavaleiro_escolhido(p, "gato_de_botas")
 	if c == null:
 		return
 	var face: int = dado.rolar("gato_" + Regras.chave(c.id_instancia))
@@ -867,11 +899,12 @@ func _gato(p) -> void:
 func _chao_e_lava(participantes: Array) -> void:
 	var todos_descartaram := true
 	for p in participantes:
-		if _descartar_da_mao(p, decisores[p.id].descarte_plataforma(self, p)):
+		var descarte = await decisores[p.id].descarte_plataforma(self, p)
+		if _descartar_da_mao(p, descarte):
 			_superou_evento(p)
 		else:
 			todos_descartaram = false
-			var c = _cavaleiro_escolhido(p, "o_chao_e_lava")
+			var c = await _cavaleiro_escolhido(p, "o_chao_e_lava")
 			if c != null:
 				_ferir_cavaleiro(p, c, 3, null)
 				_envolvido_ao_fim(p, c)
@@ -952,7 +985,7 @@ func _repor(j) -> void:
 		var moedas: int = j.moedas
 		var pagaveis := reveladas.filter(func(c): return c.custo() <= moedas)
 		if not pagaveis.is_empty():
-			var escolhida = decisores[j.id].escolher_reposicao(self, j, reveladas, pagaveis)
+			var escolhida = await decisores[j.id].escolher_reposicao(self, j, reveladas, pagaveis)
 			if escolhida == null or not pagaveis.has(escolhida):
 				escolhida = pagaveis[0]
 			j.moedas -= escolhida.custo()
@@ -1006,10 +1039,10 @@ func _verificar_avanco(j) -> bool:
 	j.inimigos = 0
 	j.eventos = 0
 	# Conversão de Prestígio
-	var modo: String = decisores[j.id].conversao(self, j)
+	var modo: String = await decisores[j.id].conversao(self, j)
 	if modo == "status":
 		for c in j.fila:
-			var dist: Dictionary = decisores[j.id].distribuir_status(self, j, c)
+			var dist: Dictionary = await decisores[j.id].distribuir_status(self, j, c)
 			var f := int(dist.get("forca", 0))
 			var a := int(dist.get("armadura", 0))
 			var h := int(dist.get("honra", 0))
@@ -1034,7 +1067,7 @@ func _verificar_avanco(j) -> bool:
 	var destino: String = cat.proximo_reino(origem)
 	if por == "chefe_derrotado":
 		var permitidos: Array = cat.circuito.filter(func(r): return r != origem)
-		var escolha: String = decisores[j.id].escolher_reino(self, j, permitidos)
+		var escolha: String = await decisores[j.id].escolher_reino(self, j, permitidos)
 		destino = escolha if permitidos.has(escolha) else permitidos[0]
 	j.reino_atual = destino
 	for c in j.fila:

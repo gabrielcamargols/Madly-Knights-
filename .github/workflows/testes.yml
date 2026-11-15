@@ -1,9 +1,12 @@
-name: Cenários de regras
+name: Testes e versão web
 
 on:
   push:
   pull_request:
   workflow_dispatch:
+
+env:
+  GODOT_VERSAO: 4.7.2
 
 jobs:
   cenarios:
@@ -11,15 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Baixar Godot 4.7
+      - name: Baixar Godot
         run: |
-          for v in 4.7.2 4.7.1 4.7; do
-            url="https://github.com/godotengine/godot/releases/download/${v}-stable/Godot_v${v}-stable_linux.x86_64.zip"
-            if curl -fsSL -o godot.zip "$url"; then echo "Usando Godot $v"; break; fi
-          done
-          unzip -q godot.zip
-          mv Godot_v*_linux.x86_64 godot
-          chmod +x godot
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSAO}-stable/Godot_v${GODOT_VERSAO}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv Godot_v*_linux.x86_64 godot && chmod +x godot
           ./godot --version
 
       - name: Importar projeto e checar scripts
@@ -33,3 +31,57 @@ jobs:
           ./godot --headless --path . -s res://testes/executar_cenarios.gd 2>&1 | tee saida.txt
           if grep -q "SCRIPT ERROR" saida.txt; then echo "Erro de script"; exit 1; fi
           grep -q "TODOS OS CENÁRIOS PASSARAM" saida.txt
+
+      - name: Capturas da mesa jogável
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          xvfb-run -a -s "-screen 0 720x1280x24" ./godot --path . --rendering-driver opengl3 --resolution 720x1280 -s res://testes/captura.gd 2>&1 | tee captura.txt
+          if grep -q "SCRIPT ERROR" captura.txt; then echo "Erro de script na mesa"; exit 1; fi
+          ls capturas
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: capturas/
+
+  web:
+    needs: cenarios
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar Godot e o modelo de exportação web
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSAO}-stable/Godot_v${GODOT_VERSAO}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv Godot_v*_linux.x86_64 godot && chmod +x godot
+          curl -fsSL -o modelos.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSAO}-stable/Godot_v${GODOT_VERSAO}-stable_export_templates.tpz"
+          unzip -q modelos.tpz "templates/web_nothreads_release.zip" "templates/version.txt"
+          destino="$HOME/.local/share/godot/export_templates/${GODOT_VERSAO}.stable"
+          mkdir -p "$destino" && mv templates/* "$destino/"
+          ls "$destino"
+
+      - name: Exportar para a web
+        run: |
+          ./godot --headless --path . --import > /dev/null 2>&1 || true
+          mkdir -p build/web
+          ./godot --headless --path . --export-release "Web" build/web/index.html 2>&1 | tail -20
+          ls -la build/web
+          test -f build/web/index.pck
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  publicar:
+    needs: web
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

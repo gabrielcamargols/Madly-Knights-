@@ -24,10 +24,10 @@ const TAM_CARTA_3D := Vector2(1.1, 1.54)
 const ESPACO_VAGA := 1.3
 const VAGAS := 6
 const POS_FILA_Z := 0.35
-const POS_ENCONTRO := Vector3(0.0, 0.0, -1.85)
+const POS_ENCONTRO := Vector3(0.0, 0.0, -1.55)
 const ESCALA_ENCONTRO := 1.45
-const POS_REINO := Vector3(-4.6, 0.0, -1.85)
-const POS_CEMITERIO := Vector3(4.6, 0.0, -1.85)
+const POS_REINO := Vector3(-4.9, 0.0, -2.0)
+const POS_CEMITERIO := Vector3(4.9, 0.0, -2.0)
 const POS_ENTRADA := Vector3(0.0, 0.0, 3.6)
 const PIXELS_CARTA := Vector2i(280, 392)  # textura de cada carta da mesa
 
@@ -208,7 +208,7 @@ func _ajustar_camera() -> void:
 	if tamanho.x >= tamanho.y:
 		camera.keep_aspect = Camera3D.KEEP_HEIGHT
 		camera.fov = 40
-		camera.look_at_from_position(Vector3(0, 6.4, 5.6), Vector3(0, 0, -0.35))
+		camera.look_at_from_position(Vector3(0, 6.6, 5.0), Vector3(0, 0, -0.85))
 	else:
 		camera.keep_aspect = Camera3D.KEEP_WIDTH
 		camera.fov = 70
@@ -266,7 +266,7 @@ func _criar_figura(figura: Node3D, altura_placa: float) -> Node3D:
 	placa.name = "Placa"
 	placa.texture = vp.get_texture()
 	placa.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	placa.pixel_size = 0.0045
+	placa.pixel_size = 0.004
 	placa.no_depth_test = true
 	placa.render_priority = 10
 	placa.position = Vector3(0, altura_placa, 0)
@@ -406,7 +406,7 @@ func _atualizar_inimigo() -> void:
 		figura_inimigo.position = POS_ENCONTRO
 		var figura: Node3D = figura_inimigo.get_node("Figura")
 		figura.scale = Vector3.ONE * escala
-		figura_inimigo.get_node("Placa").position.y = 1.55 * escala
+		figura_inimigo.get_node("Placa").position.y = 1.3 * escala
 	_desenhar(figura_inimigo, _face_placa(ini.nome, ini.armadura_atual, ini.armadura_maxima, ini.forca_total(), Color(0.9, 0.2, 0.15), Color(0.9, 0.3, 0.2) if modo != "ataque" else Color(1, 0.85, 0.3)))
 	if not ini.vivo() and figura_inimigo.get_meta("vivo", true):
 		figura_inimigo.set_meta("vivo", false)

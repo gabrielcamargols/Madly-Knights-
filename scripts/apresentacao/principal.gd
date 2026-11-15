@@ -314,7 +314,9 @@ func _face_placa(nome: String, armadura: int, maxima: int, forca: int, cor_barra
 	var linha := _ignorar_mouse(HBoxContainer.new())
 	coluna.add_child(linha)
 	linha.add_child(_medalhao(str(forca), COR_FORCA, 0.95))
-	var rotulo := _texto(nome, 22, Color.WHITE, 5)
+	# A fonte diminui com o tamanho do nome, para caber inteiro na plaquinha.
+	var tamanho_fonte := clampi(int(165.0 / (0.56 * maxf(nome.length(), 1.0))), 12, 22)
+	var rotulo := _texto(nome, tamanho_fonte, Color.WHITE, 5)
 	rotulo.autowrap_mode = TextServer.AUTOWRAP_OFF
 	rotulo.clip_text = true
 	rotulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

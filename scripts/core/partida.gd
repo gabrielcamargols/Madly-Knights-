@@ -936,6 +936,8 @@ func _lute_por_honra(j) -> void:
 # --- Reposição ------------------------------------------------------------------
 
 func _repor(j) -> void:
+	if j.vagas <= 0:
+		return
 	while j.vagas > 0 and j.fila.size() < Regras.LIMITE_CAMPO:
 		j.vagas -= 1
 		if j.baralho.is_empty():

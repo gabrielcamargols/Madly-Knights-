@@ -296,7 +296,7 @@ func _criar_figura(figura: Node3D, altura_placa: float) -> Node3D:
 	placa.name = "Placa"
 	placa.texture = vp.get_texture()
 	placa.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	placa.pixel_size = 0.004
+	placa.pixel_size = 0.0049  # legível com a câmera mais aberta
 	placa.no_depth_test = true
 	placa.render_priority = 10
 	placa.position = Vector3(0, altura_placa, 0)

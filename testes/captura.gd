@@ -124,8 +124,9 @@ func _salvar_uma_vez(nome: String) -> void:
 
 
 func _salvar(nome: String) -> void:
-	DirAccess.make_dir_recursive_absolute("res://capturas")
+	DirAccess.make_dir_recursive_absolute("res://capturas/miniaturas")
 	var imagem := root.get_viewport().get_texture().get_image()
-	imagem.resize(imagem.get_width() / 2, imagem.get_height() / 2, Image.INTERPOLATE_BILINEAR)
 	imagem.save_png("res://capturas/%s.png" % nome)
+	imagem.resize(imagem.get_width() / 2, imagem.get_height() / 2, Image.INTERPOLATE_BILINEAR)
+	imagem.save_png("res://capturas/miniaturas/%s.png" % nome)
 	print("Captura salva: " + nome)

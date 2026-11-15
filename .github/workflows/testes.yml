@@ -38,12 +38,12 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x720x24" ./godot --path . --rendering-driver opengl3 --resolution 1280x720 -s res://testes/captura.gd 2>&1 | tee captura.txt
           if grep -q "SCRIPT ERROR" captura.txt; then echo "Erro de script na mesa"; exit 1; fi
           ls capturas
-          for f in capturas/*.png; do echo "IMG_INICIO $f"; base64 -w0 "$f"; echo; echo "IMG_FIM"; done
+          for f in capturas/miniaturas/*.png; do echo "IMG_INICIO $f"; base64 -w0 "$f"; echo; echo "IMG_FIM"; done
 
       - uses: actions/upload-artifact@v4
         with:
           name: capturas
-          path: capturas/
+          path: capturas/*.png
 
   web:
     needs: cenarios
@@ -68,6 +68,24 @@ jobs:
           ./godot --headless --path . --export-release "Web" build/web/index.html 2>&1 | tail -20
           ls -la build/web
           test -f build/web/index.pck
+
+      - name: Baixar as capturas desta versão
+        uses: actions/download-artifact@v4
+        with:
+          name: capturas
+          path: build/web/capturas
+
+      - name: Página de capturas
+        run: |
+          cd build/web/capturas
+          {
+            echo '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            echo '<title>Madly Knights — capturas</title><style>body{background:#151815;color:#eee;font-family:sans-serif;margin:16px}img{width:100%;max-width:960px;border:2px solid #c9a24a;border-radius:8px}figure{margin:0 0 28px}a{color:#f5c84c}</style></head><body>'
+            echo "<h1>Madly Knights — capturas</h1><p>Versão ${GITHUB_SHA::7}, gerada em $(date -u '+%d/%m/%Y %H:%M') UTC. <a href=\"../\">Jogar</a></p>"
+            for f in $(ls *.png | sort -V); do echo "<figure><img src=\"$f\" loading=\"lazy\"><figcaption>${f%.png}</figcaption></figure>"; done
+            echo '</body></html>'
+          } > index.html
+          ls
 
       - uses: actions/upload-pages-artifact@v3
         with:

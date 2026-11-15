@@ -13,6 +13,7 @@ const Dado = preload("res://scripts/core/dado.gd")
 const Embaralhador = preload("res://scripts/core/embaralhador.gd")
 const DecisorInterface = preload("res://scripts/apresentacao/decisor_interface.gd")
 const Sessao = preload("res://scripts/apresentacao/sessao.gd")
+const Regras = preload("res://scripts/core/regras.gd")
 
 const ESPACO_CARTA := 1.2
 const POS_FILA_Z := 0.75
@@ -349,12 +350,21 @@ func _ao_rolar(motivo: String, face: int) -> void:
 
 func _motivo_legivel(motivo: String) -> String:
 	if motivo.begins_with("contra_ataque_"):
-		return "Contra-ataque: %s" % motivo.substr(14).capitalize()
+		var ini = partida.inimigo_atual
+		return "Contra-ataque: %s" % (ini.nome if ini != null else motivo.substr(14).capitalize())
 	if motivo.begins_with("ataque_"):
-		return "Ataque: %s" % motivo.substr(7).capitalize()
+		return "Ataque: %s" % _nome_por_chave(motivo.substr(7))
 	if motivo.begins_with("iniciativa_"):
 		return "Iniciativa: Jogador %s" % motivo.substr(12)
 	return motivo.replace("_", " ").capitalize()
+
+
+## Nome do Cavaleiro a partir do nome curto usado nas rolagens ("dragao" -> "Dragão").
+func _nome_por_chave(chave_curta: String) -> String:
+	for c in jogador.fila + jogador.cemiterio + jogador.mao:
+		if Regras.chave(c.id_instancia) == chave_curta:
+			return _nome_curto(c)
+	return chave_curta.capitalize()
 
 
 func _ao_registrar(texto: String) -> void:
